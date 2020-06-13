@@ -12,8 +12,6 @@ const args = { owner: owner.name || owner.login, repo: repo.name };
 
 try {
   console.log(`The event context: ${JSON.stringify(context, undefined, 2)}`);
-  console.log(context.payload.pull_request)
-  
   const gh = getOctokit(core.getInput('token'));
 
   // Exclude merge commits
@@ -22,12 +20,12 @@ try {
 		commits = commits.filter(c => c.distinct);
   }
   
-  commits.forEach(commit => {
+  commits.forEach(async commit => {
     args.ref = commit.id || commit.sha;
 
     console.log('Calling gh.repos.getCommit() with args', args)
 
-    const res = gh.repos.getCommit(args);
+    const res = await gh.repos.getCommit(args);
     console.log(res)
   })
 
