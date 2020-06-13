@@ -14,7 +14,7 @@ try {
   console.log(`The event context: ${JSON.stringify(context, undefined, 2)}`);
   console.log(context.payload.pull_request)
   
-  const gh = github.getOctokit(core.getInput('token'));
+  const gh = getOctokit(core.getInput('token'));
 
   // Exclude merge commits
   let commits = context.payload.commits.filter(c => ! c.parents || 1 === c.parents.length)
