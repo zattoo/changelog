@@ -19,14 +19,14 @@ try {
   if ('push' === context.eventName) {
 		commits = commits.filter(c => c.distinct);
   }
-  
+
   commits.forEach(async commit => {
     args.ref = commit.id || commit.sha;
 
     console.log('Calling gh.repos.getCommit() with args', args)
 
     const res = await gh.repos.getCommit(args);
-    console.log(res)
+    console.log(res.data.files)
   })
 
 
