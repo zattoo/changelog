@@ -7,7 +7,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-        name: Get modified files
       - id: files
         uses: jitterbit/get-changed-files@v1
       - run: |
