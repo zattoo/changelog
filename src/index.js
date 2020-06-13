@@ -20,13 +20,21 @@ try {
 		commits = commits.filter(c => c.distinct);
   }
 
+  let modifiedFiles = [];
+
   commits.forEach(async commit => {
     args.ref = commit.id || commit.sha;
 
     console.log('Calling gh.repos.getCommit() with args', args)
 
     const res = await gh.repos.getCommit(args);
-    console.log(res.data.files)
+    if (res.data && res.data.files) {
+      res.data.files.forEach(file => {
+        modifiedFiles.push(file)
+      })
+    }
+
+    console.log(modifiedFiles)
   })
 
 
