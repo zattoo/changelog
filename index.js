@@ -2,7 +2,7 @@ const core = require('@actions/core');
 const github = require('@actions/github');
 
 const changelogs = core.getInput('changelogs')
-console.log(changelogs)
+console.log(changelogs[0])
 
 try {
   // `who-to-greet` input defined in action metadata file
