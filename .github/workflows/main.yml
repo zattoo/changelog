@@ -10,6 +10,6 @@ jobs:
       - name: Use changelog-validate action
         uses: ./ # Uses an action in the root directory
         with:
-          changelogs: '[{"folder": "testFolder", "changelog": "CHANGELOG.md"}]'
+          changelogs: '[{"watchFolder": "examples", "file": "examples/CHANGELOG.md"}]'
 
 
