@@ -6,9 +6,31 @@ const {context, GitHub} = require('@actions/github');
 const {validateChangelog} = require('./validate');
 const ingnoreActionMessage = `-Changelog` // ToDo: make it customizable
 
+const repo = context.payload.repository;
+const owner = repo.owner;
+const args = { owner: owner.name || owner.login, repo: repo.name };
+
 try {
   console.log(`The event context: ${JSON.stringify(context, undefined, 2)}`);
   console.log(context.payload.pull_request)
+
+  // Exclude merge commits
+  let commits = context.payload.commits.filter(c => ! c.parents || 1 === c.parents.length)
+  if ('push' === context.eventName) {
+		commits = commits.filter(c => c.distinct);
+  }
+  
+  commits.forEach(commit => {
+    args.ref = commit.id || commit.sha;
+
+    console.log('Calling gh.repos.getCommit() with args', args)
+
+    const res = gh.repos.getCommit(args);
+    console.log(res)
+  })
+
+
+
 
   // const commitsIDs = context.commits()
 
