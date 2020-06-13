@@ -14,7 +14,7 @@ const args = { owner: owner.name || owner.login, repo: repo.name };
 const getFiles = async (commits) => {
   let modifiedFiles = [];
 
-  await Promise.all(commits.forEach(commit => {
+  await Promise.all(commits.forEach(async commit => {
     args.ref = commit.id || commit.sha;
 
     console.log('Calling gh.repos.getCommit() with args', args)
