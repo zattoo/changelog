@@ -11,27 +11,29 @@ const owner = repo.owner;
 const args = { owner: owner.name || owner.login, repo: repo.name };
 
 
-const getFiles = async (commits) => {
-  let modifiedFiles = [];
+// const getFiles = async (commits) => {
+//   let modifiedFiles = [];
 
-  await Promise.all(commits.forEach(async commit => {
-    args.ref = commit.id || commit.sha;
+//   await Promise.all(commits.forEach(async commit => {
+//     args.ref = commit.id || commit.sha;
 
-    console.log('Calling gh.repos.getCommit() with args', args)
+//     console.log('Calling gh.repos.getCommit() with args', args)
 
-    const res = await gh.repos.getCommit(args);
-    if (res.data && res.data.files) {
-      res.data.files.forEach(file => {
-        modifiedFiles.push(file.filename)
-      })
-    }
-  }));
+//     const res = await gh.repos.getCommit(args);
+//     if (res.data && res.data.files) {
+//       res.data.files.forEach(file => {
+//         modifiedFiles.push(file.filename)
+//       })
+//     }
+//   }));
 
-  return modifiedFiles;
-}
+//   core.get
+
+//   return modifiedFiles;
+// }
 
 try {
-  const gh = getOctokit(core.getInput('token'));
+  // const gh = getOctokit(core.getInput('token'));
 
   // Exclude merge commits
   let commits = context.payload.commits.filter(c => ! c.parents || 1 === c.parents.length)
@@ -39,8 +41,9 @@ try {
 		commits = commits.filter(c => c.distinct);
   }
 
-  getFiles(commits)
-  
+  // getFiles(commits)
+  const files = core.getInput('modifiedFiles')
+  console.log(files)
 
   const CHANGELOGS = JSON.parse(core.getInput('changelogs'))
 

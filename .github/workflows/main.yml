@@ -7,10 +7,18 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        name: Get modified files
+      - id: files
+        uses: jitterbit/get-changed-files@v1
+      - run: |
+          for changed_file in ${{ steps.files.outputs.all }}; do
+            echo "Do something with this ${changed_file}."
+          done
       - name: Use changelog-validate action
         uses: ./ # Uses an action in the root directory
         with:
           token: ${{ github.token }}
+          modifiedFiles: ${{ steps.files.outputs.all }}
           changelogs: '[{"watchFolder": "examples", "file": "examples/CHANGELOG.md"}]'
 
 
