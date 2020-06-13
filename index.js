@@ -1,7 +1,9 @@
 const core = require('@actions/core');
 const github = require('@actions/github');
 
-const changelogs = core.getInput('changelogs')
+const changelogs = JSON.parse(core.getInput('changelogs'))
+
+
 console.log(changelogs[0])
 
 try {
