@@ -21,7 +21,7 @@ try {
       // If it has, verify the changelog
       // If is not modified warn it
 
-    const changelogContent = fr.readFileSync(changelog.file, { encoding: 'utf-8' });
+    const changelogContent = fs.readFileSync(changelog.file, { encoding: 'utf-8' });
     console.log(changelogContent);
     validateChangelog(changelogContent);
   
