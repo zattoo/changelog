@@ -1,6 +1,9 @@
 name: 'Changelog Validator'
 description: 'Detects changes and validates a given changelog'
 inputs:
+  token:
+    description: 'GitHub token'
+    required: true
   changelogs: 
     description: 'Array with all Changelogs in the project'
     required: true

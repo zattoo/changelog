@@ -115,15 +115,12 @@ const validateH2 = (text) => {
     })
 }
 
-
 const validateChangelog = (text) => {
     validateH1(text);
     validateH2(text);
     validateH3(text);
-    console.info('✔️ All good')
     return true
 }
-
 
 module.exports = {
     validateChangelog
