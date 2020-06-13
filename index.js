@@ -1,20 +1,24 @@
 const core = require('@actions/core');
 const github = require('@actions/github');
 
-const changelogs = JSON.parse(core.getInput('changelogs'))
-
-
-console.log(changelogs[0])
-
 try {
-  // `who-to-greet` input defined in action metadata file
-  const nameToGreet = core.getInput('who-to-greet');
-  console.log(`Hello ${nameToGreet}!`);
-  const time = (new Date()).toTimeString();
-  core.setOutput("time", time);
-  // Get the JSON webhook payload for the event that triggered the workflow
-  const payload = JSON.stringify(github.context.payload, undefined, 2)
-  console.log(`The event payload: ${payload}`);
+  const CHANGELOGS = JSON.parse(core.getInput('changelogs'))
+
+  // Not do anything if -Changelog is a commit message
+  const ignoreAction = github.context.payload.commits.some(commit => commit.message === '-Action')
+  console.log({ignoreAction})
+  if (ignoreAction) {
+    console.log('Exit')
+    process.exit(0)
+  }
+
+  CHANGELOGS.forEach(changelog => {
+    console.log(changelog)
+  })
+  
+  const context = JSON.stringify(github.context, undefined, 2)
+  console.log(`The event context: ${context}`);
+
 } catch (error) {
   core.setFailed(error.message);
 }
