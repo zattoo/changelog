@@ -11,7 +11,6 @@ const owner = repo.owner;
 const args = { owner: owner.name || owner.login, repo: repo.name };
 
 try {
-  console.log(`The event context: ${JSON.stringify(context, undefined, 2)}`);
   const gh = getOctokit(core.getInput('token'));
 
   // Exclude merge commits
@@ -20,13 +19,21 @@ try {
 		commits = commits.filter(c => c.distinct);
   }
 
+  let modifiedFiles = [];
+
   commits.forEach(async commit => {
     args.ref = commit.id || commit.sha;
 
     console.log('Calling gh.repos.getCommit() with args', args)
 
     const res = await gh.repos.getCommit(args);
-    console.log(res.data.files)
+    if (res.data && res.data.files) {
+      res.data.files.forEach(file => {
+        modifiedFiles.push(file.filename)
+      })
+    }
+
+    console.log(modifiedFiles)
   })
 
 
@@ -85,6 +92,8 @@ try {
     const changelogContent = fs.readFileSync(changelog.file, { encoding: 'utf-8' });
     validateChangelog(changelogContent);
   })
+
+  console.log(`The event context: ${JSON.stringify(context, undefined, 2)}`);
 } catch (error) {
   core.setFailed(error.message);
 }
