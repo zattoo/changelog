@@ -7,8 +7,7 @@ const {validateChangelog} = require('./validate');
 const ingnoreActionMessage = `-Changelog` // ToDo: make it customizable
 
 try {
-  core.debug(`The event context: ${JSON.stringify(context, undefined, 2)}`);
-
+  console.log(`The event context: ${JSON.stringify(context, undefined, 2)}`);
   console.log(context.payload.pull_request)
 
   // const commitsIDs = context.commits()
@@ -45,7 +44,7 @@ try {
   //   repo: context.repo.repo
   // })
 
-  console.log(response)
+  // console.log(response)
 
   const CHANGELOGS = JSON.parse(core.getInput('changelogs'))
 
