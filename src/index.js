@@ -1,6 +1,6 @@
 const fs = require('fs');
 const core = require('@actions/core');
-const {context, GitHub} = require('@actions/github');
+const {context, getOctokit} = require('@actions/github');
 // const { graphql } = require("@octokit/graphql");
 
 const {validateChangelog} = require('./validate');
@@ -14,7 +14,7 @@ try {
   console.log(`The event context: ${JSON.stringify(context, undefined, 2)}`);
   console.log(context.payload.pull_request)
   
-  const gh = new GitHub(core.getInput('token', {required: true}));
+  const gh = github.getOctokit(core.getInput('token'));
 
   // Exclude merge commits
   let commits = context.payload.commits.filter(c => ! c.parents || 1 === c.parents.length)
