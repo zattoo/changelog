@@ -10,18 +10,11 @@ const repo = context.payload.repository;
 const owner = repo.owner;
 const args = { owner: owner.name || owner.login, repo: repo.name };
 
-try {
-  const gh = getOctokit(core.getInput('token'));
 
-  // Exclude merge commits
-  let commits = context.payload.commits.filter(c => ! c.parents || 1 === c.parents.length)
-  if ('push' === context.eventName) {
-		commits = commits.filter(c => c.distinct);
-  }
-
+const getFiles = async (commits) => {
   let modifiedFiles = [];
 
-  commits.forEach(async commit => {
+  await Promise.all(commits.forEach(commit => {
     args.ref = commit.id || commit.sha;
 
     console.log('Calling gh.repos.getCommit() with args', args)
@@ -32,48 +25,22 @@ try {
         modifiedFiles.push(file.filename)
       })
     }
+  }));
 
-    console.log(modifiedFiles)
-  })
+  return modifiedFiles;
+}
 
+try {
+  const gh = getOctokit(core.getInput('token'));
 
+  // Exclude merge commits
+  let commits = context.payload.commits.filter(c => ! c.parents || 1 === c.parents.length)
+  if ('push' === context.eventName) {
+		commits = commits.filter(c => c.distinct);
+  }
 
-
-  // const commitsIDs = context.commits()
-
-  // const client = new GitHub(core.getInput('token', {required: true}));
-
-  // const { repository } = await graphql(
-  //   `
-  //     {
-  //       repository(owner: "octokit", name: "graphql.js") {
-  //         issues(last: 3) {
-  //           edges {
-  //             node {
-  //               title
-  //             }
-  //           }
-  //         }
-  //       }
-  //     }
-  //   `,
-  //   {
-  //     headers: {
-  //       authorization: token,
-  //     },
-  //   }
-  // );
-
-
-
-  // const response = await client.repos.compareCommits({
-  //   base,
-  //   head,
-  //   owner: context.repo.owner,
-  //   repo: context.repo.repo
-  // })
-
-  // console.log(response)
+  getFiles(commits)
+  
 
   const CHANGELOGS = JSON.parse(core.getInput('changelogs'))
 
