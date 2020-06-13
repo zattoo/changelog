@@ -12,7 +12,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 - Update libs
 - Pass new value to function
 
-## [3.2026.2] - 20.05.2020
+## [3.2026.0] - 20.05.2020
 
 ### Added
 - Some cool stuff

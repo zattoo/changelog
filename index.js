@@ -22,9 +22,7 @@ try {
       // If is not modified warn it
 
     const changelogContent = fs.readFileSync(changelog.file, { encoding: 'utf-8' });
-    console.log(changelogContent);
     validateChangelog(changelogContent);
-  
   })
   
   const context = JSON.stringify(github.context, undefined, 2)
