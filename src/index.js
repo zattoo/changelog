@@ -1,6 +1,6 @@
 const fs = require('fs');
 const core = require('@actions/core');
-const { context, getOctokit } = require('@actions/github');
+const { context } = require('@actions/github');
 
 const { validateChangelog } = require('./validate');
 
@@ -10,7 +10,7 @@ const repo = context.payload.repository.name;
 const { owner } = context.payload;
 const { sha } = context.payload;
 
-const getPR = async (octokit) => {
+const getPR = () => {
   console.log(repo, owner, sha);
   // const PRS = await octokit.repos.listPullRequestsAssociatedWithCommit({
   //   owner,
@@ -27,9 +27,9 @@ try {
   const modifiedFiles = JSON.parse(core.getInput('modifiedFiles'));
   console.log(modifiedFiles);
 
-  const octokit = getOctokit(token);
+  // const octokit = getOctokit(token);
 
-  getPR(octokit);
+  getPR();
 
   console.log(process.env);
 
