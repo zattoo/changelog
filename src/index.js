@@ -13,7 +13,7 @@ const run = async () => {
     const octokit = getOctokit(token);
 
     const repo = context.payload.repository.name;
-    const owner = context.payload.repository.owner.full_name.split('/')[0];
+    const owner = context.payload.repository.full_name.split('/')[0];
     const PR = context.payload.pull_request.number;
     // const { sha } = context;
 
