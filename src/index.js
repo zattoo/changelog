@@ -1,6 +1,6 @@
 const fs = require('fs');
 const core = require('@actions/core');
-const { context, GitHub } = require('@actions/github');
+const { context } = require('@actions/github');
 
 const { validateChangelog } = require('./validate');
 
@@ -29,8 +29,8 @@ try {
   const token = JSON.parse(core.getInput('token', { required: true }));
   console.log(token);
 
-  const octokit = new GitHub(token);
-  console.log(octokit);
+  // const octokit = new GitHub(token);
+  // console.log(octokit);
 
 
   // getPR(octokit);
