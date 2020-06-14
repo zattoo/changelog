@@ -10,6 +10,10 @@ inputs:
   modifiedFiles:
     description: 'Array with all modified files'
     reequired: true
+  ingnoreActionMessage:
+    description: 'Commit message to avoid executing the action'
+    reequired: false
+    default: '-Changelog'
 runs:
   using: 'node12'
   main: 'src/index.js'

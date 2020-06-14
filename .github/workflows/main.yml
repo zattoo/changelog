@@ -7,17 +7,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - id: file_changes
-        uses: trilom/file-changes-action@v1.2.3
-      - run: |
-          for changed_file in ${{ steps.file_changes.outputs.files }}; do
-            echo "Do something with this ${changed_file}."
-          done
       - name: Use changelog-validate action
         uses: ./ # Uses an action in the root directory
         with:
           token: ${{ github.token }}
-          modifiedFiles: ${{ steps.file_changes.outputs.files }}
           changelogs: '[{"watchFolder": "examples", "file": "examples/CHANGELOG.md"}]'
 
 
