@@ -12,8 +12,6 @@ const run = async () => {
     const ingnoreActionMessage = core.getInput('ignoreActionMessage');
     const octokit = getOctokit(token);
 
-    console.log(context);
-
     // Not do anything if -Changelog is a commit message
     const ignoreAction = context.payload.commits
       .some((commit) => commit.message === ingnoreActionMessage);
@@ -24,9 +22,10 @@ const run = async () => {
 
     const repo = context.payload.repository.name;
     const owner = context.payload.repository.owner.name;
-    const { sha } = context;
+    // const { sha } = context;
 
-    const modifiedFiles = await getModifiedFiles(octokit, repo, owner, sha);
+    const PR = context.payload.pull_request.number;
+    const modifiedFiles = await getModifiedFiles(octokit, repo, owner, PR);
 
     changelogs.forEach((changelog) => {
       // Check if at least one file was modified in the watchFolder
