@@ -7,8 +7,8 @@ const { validateChangelog } = require('./validate');
 const ingnoreActionMessage = '-Changelog'; // ToDo: make it customizable
 
 const repo = context.payload.repository.name;
-const { owner } = context.payload;
-const { sha } = context.payload;
+const owner = context.payload.owner.name;
+const { sha } = context.payload.sha;
 console.log(repo, owner, sha);
 
 // const getPR = () => {
