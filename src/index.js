@@ -1,6 +1,6 @@
 const fs = require('fs');
 const core = require('@actions/core');
-const {context} = require('@actions/github');
+const {context, getOctokit} = require('@actions/github');
 
 const {validateChangelog} = require('./validate');
 const ingnoreActionMessage = `-Changelog` // ToDo: make it customizable
@@ -8,11 +8,26 @@ const ingnoreActionMessage = `-Changelog` // ToDo: make it customizable
 const repo = context.payload.repository;
 const owner = repo.owner;
 
+const getPR = async (octokit) => {
+  
+  const PRS = await octokit.repos.listPullRequestsAssociatedWithCommit({
+    owner,
+    repo,
+    commit_sha,
+  });
+
+  console.log(PRS)
+}
+
 try {
   const CHANGELOGS = JSON.parse(core.getInput('changelogs'));
   const modifiedFiles = JSON.parse(core.getInput('modifiedFiles'));
   console.log(modifiedFiles);
 
+  const octokit = github.getOctokit(myToken)
+
+  getPR(octokit)
+  
   const eventPath = process.env.GITHUB_EVENT_PATH
   const events = fs.readFileSync(eventPath, { encoding: 'utf-8' });
   console.log(events)
