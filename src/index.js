@@ -9,7 +9,9 @@ const repo = context.payload.repository;
 const owner = repo.owner;
 
 try {
-  const CHANGELOGS = JSON.parse(core.getInput('changelogs'))
+  const CHANGELOGS = JSON.parse(core.getInput('changelogs'));
+  const modifiedFiles = JSON.parse(core.getInput('changelogs'));
+  console.log(modifiedFiles);
 
   // Not do anything if -Changelog is a commit message
   const ignoreAction = context.payload.commits.some(commit => commit.message === ingnoreActionMessage)
