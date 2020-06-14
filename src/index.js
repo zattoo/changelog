@@ -13,6 +13,12 @@ try {
   const modifiedFiles = JSON.parse(core.getInput('modifiedFiles'));
   console.log(modifiedFiles);
 
+  const eventPath = process.env.GITHUB_EVENT_PATH
+  const events = fs.readFileSync(eventPath, { encoding: 'utf-8' });
+  console.log(events)
+
+  console.log('-------------')
+  
   console.log(process.env);
 
   // Not do anything if -Changelog is a commit message
