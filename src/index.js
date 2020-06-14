@@ -1,6 +1,6 @@
 const fs = require('fs');
 const core = require('@actions/core');
-const { context } = require('@actions/github');
+const { context, GitHub } = require('@actions/github');
 
 const { validateChangelog } = require('./validate');
 
