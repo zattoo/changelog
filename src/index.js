@@ -24,6 +24,8 @@ const run = async () => {
       pull_number: pullNumber,
     });
 
+    console.log(commits.data);
+
     // Not do anything if -Changelog is a commit message
     const ignoreAction = commits.data
       .some((commit) => commit.message === ingnoreActionMessage);
