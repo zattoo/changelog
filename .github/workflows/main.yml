@@ -14,7 +14,7 @@ jobs:
             echo "Do something with this ${changed_file}."
           done
       - run: |
-          echo "::set-env name=PR_NUMBER::$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
+          echo "::set-env name=PR_NUMBER::$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")"
       - name: Use changelog-validate action
         uses: ./ # Uses an action in the root directory
         with:
