@@ -46,7 +46,7 @@ const run = async () => {
       validateChangelog(changelogContent);
     });
   } catch (error) {
-    core.debug(error);
+    console.log(error);
     core.setFailed(error.message);
   }
 };
