@@ -24,10 +24,10 @@ try {
   const modifiedFiles = JSON.parse(core.getInput('modifiedFiles'));
   console.log(modifiedFiles);
 
-  const octokit = github.getOctokit(myToken)
+  const octokit = getOctokit(myToken)
 
   getPR(octokit)
-  
+
   const eventPath = process.env.GITHUB_EVENT_PATH
   const events = fs.readFileSync(eventPath, { encoding: 'utf-8' });
   console.log(events)
