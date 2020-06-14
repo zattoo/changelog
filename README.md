@@ -1,21 +1,40 @@
-# Hello world javascript action
-
-This action prints "Hello World" or "Hello" + the name of a person to greet to the log.
+# Changelog Validate 📋
+GitHub Action to validate CHANGELOG.md files and notify in the case that needs to be modified.
 
 ## Inputs
 
-### `who-to-greet`
+### `token`
 
-**Required** The name of the person to greet. Default `"World"`.
+`string`
 
-## Outputs
+Required. GitHub token
 
-### `time`
+### `changelogs`
 
-The time we greeted you.
+`json string`
 
-## Example usage
+Required. Array with all changelogs and the folder that needs to be checked for changes
 
-uses: actions/hello-world-javascript-action@v1
-with:
-  who-to-greet: 'Mona the Octocat'
+### `ignoreActionMessage`
+
+`string`,  default: `-Changelog`
+
+Commit message to avoid executing the action
+
+## Usage Example
+
+````yaml
+on: [pull_request]
+
+jobs:
+  validate_changelog:
+    runs-on: ubuntu-latest
+    name: Validate Changelog
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Use changelog-validate action
+        uses: dobladov/changelog-validate
+        with:
+          token: ${{ github.token }}
+          changelogs: '[{"watchFolder": "examples", "file": "examples/CHANGELOG.md"}]'
