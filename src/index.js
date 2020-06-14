@@ -30,7 +30,7 @@ try {
   const token = core.getInput('token', { required: true });
   console.log(token);
 
-  const octokit = new github.GitHub(token);
+  const octokit = new github.GitHub(token, { previews: ['flash', 'ant-man'] });
 
   getPR(octokit);
 
