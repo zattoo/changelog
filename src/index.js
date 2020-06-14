@@ -9,29 +9,26 @@ const ingnoreActionMessage = '-Changelog'; // ToDo: make it customizable
 const repo = context.payload.repository.name;
 const { owner } = context.payload;
 const { sha } = context.payload;
+console.log(repo, owner, sha);
 
-const getPR = () => {
-  console.log(repo, owner, sha);
-  // const PRS = await octokit.repos.listPullRequestsAssociatedWithCommit({
-  //   owner,
-  //   repo,
-  //   sha,
-  // });
+// const getPR = () => {
+//   // const PRS = await octokit.repos.listPullRequestsAssociatedWithCommit({
+//   //   owner,
+//   //   repo,
+//   //   sha,
+//   // });
 
-  // console.log(PRS);
-};
+//   // console.log(PRS);
+// };
 
 try {
-  const token = JSON.parse(core.getInput('token', { required: true }));
   const CHANGELOGS = JSON.parse(core.getInput('changelogs'));
-  const modifiedFiles = JSON.parse(core.getInput('modifiedFiles'));
-  console.log(modifiedFiles);
-
+  // const modifiedFiles = JSON.parse(core.getInput('modifiedFiles'));
+  
+  // const token = JSON.parse(core.getInput('token', { required: true }));
   // const octokit = getOctokit(token);
 
-  getPR();
-
-  console.log(process.env);
+  // getPR();
 
   // Not do anything if -Changelog is a commit message
   const ignoreAction = context.payload.commits
