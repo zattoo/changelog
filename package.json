@@ -1,5 +1,5 @@
 {
-  "name": "changelog-status",
+  "name": "changelog-validate",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -8,15 +8,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dobladov/changelog-status.git"
+    "url": "git+https://github.com/dobladov/changelog-validate.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/dobladov/changelog-status/issues"
+    "url": "https://github.com/dobladov/changelog-validate/issues"
   },
-  "homepage": "https://github.com/dobladov/changelog-status#readme",
+  "homepage": "https://github.com/dobladov/changelog-validate#readme",
   "dependencies": {
     "@actions/core": "^1.2.4",
     "@actions/github": "^3.0.0"
