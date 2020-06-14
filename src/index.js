@@ -1,11 +1,12 @@
 const fs = require('fs');
 const core = require('@actions/core');
-const { context, GitHub } = require('@actions/github');
+const github = require('@actions/github');
 
 const { validateChangelog } = require('./validate');
 
 const ingnoreActionMessage = '-Changelog'; // ToDo: make it customizable
 
+const { context } = github;
 const repo = context.payload.repository.name;
 const owner = context.payload.repository.owner.name;
 const { sha } = context;
@@ -29,7 +30,7 @@ try {
   const token = core.getInput('token', { required: true });
   console.log(token);
 
-  const octokit = new GitHub(token);
+  const octokit = new github.GitHub(token);
 
   getPR(octokit);
 
