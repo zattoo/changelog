@@ -39,6 +39,7 @@ const run = async () => {
       validateChangelog(changelogContent);
     });
   } catch (error) {
+    console.log(error);
     core.setFailed(error.message);
   }
 };
