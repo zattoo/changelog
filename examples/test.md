@@ -1,1 +1,0 @@
-Check if it will notify that changelog was not modified
