@@ -14,13 +14,12 @@ const run = async () => {
 
     const repo = context.payload.repository.name;
     const owner = context.payload.repository.full_name.split('/')[0];
-    const PR = context.payload.pull_request.number;
-    // const { sha } = context;
+    const pullNumber = context.payload.pull_request.number;
 
     const commits = await octokit.pulls.listCommits({
       owner,
       repo,
-      pull_number: PR,
+      pull_number: pullNumber,
     });
 
     // Not do anything if -Changelog is a commit message
@@ -31,14 +30,14 @@ const run = async () => {
       process.exit(0);
     }
 
-    const modifiedFiles = await getModifiedFiles(octokit, repo, owner, PR);
+    const modifiedFiles = await getModifiedFiles(octokit, repo, owner, pullNumber);
 
     changelogs.forEach((changelog) => {
       // Check if at least one file was modified in the watchFolder
       if (modifiedFiles.some((filename) => filename.startsWith(changelog.watchFolder))) {
         // Check if changelog is in the modified files
         if (!modifiedFiles.includes(changelog.file)) {
-          core.warning(`Files in ${changelog.watchFolder} have been modified but ${changelog.file} was not modified`);
+          core.setFailed(`Files in ${changelog.watchFolder} have been modified but ${changelog.file} was not modified`);
         }
       }
 
