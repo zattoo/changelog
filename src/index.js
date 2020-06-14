@@ -20,11 +20,12 @@ const getPR = async (octokit) => {
 }
 
 try {
+  const token = JSON.parse(core.getInput('token', { required: true }));
   const CHANGELOGS = JSON.parse(core.getInput('changelogs'));
   const modifiedFiles = JSON.parse(core.getInput('modifiedFiles'));
   console.log(modifiedFiles);
 
-  const octokit = getOctokit(myToken)
+  const octokit = getOctokit(token)
 
   getPR(octokit)
 
