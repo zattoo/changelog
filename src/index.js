@@ -1,16 +1,16 @@
 const fs = require('fs');
 const core = require('@actions/core');
-const {context, getOctokit} = require('@actions/github');
+const { context, getOctokit } = require('@actions/github');
 
-const {validateChangelog} = require('./validate');
-const ingnoreActionMessage = `-Changelog`; // ToDo: make it customizable
+const { validateChangelog } = require('./validate');
+
+const ingnoreActionMessage = '-Changelog'; // ToDo: make it customizable
 
 const repo = context.payload.repository.name;
 const { owner } = context.payload;
 const { sha } = context.payload;
 
 const getPR = async (octokit) => {
-
   console.log(repo, owner, sha);
   // const PRS = await octokit.repos.listPullRequestsAssociatedWithCommit({
   //   owner,
@@ -41,7 +41,7 @@ try {
     process.exit(0);
   }
 
-  CHANGELOGS.forEach(changelog => {
+  CHANGELOGS.forEach((changelog) => {
     // TODO: For each watchFolder check if it has modified files
     // If it has, verify the changelog
     // If is not modified warn it
