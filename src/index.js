@@ -12,24 +12,28 @@ const { sha } = context;
 
 console.log(repo, owner, sha);
 
-const getPR = async (octokit) => {
-  const PRS = await octokit.repos.listPullRequestsAssociatedWithCommit({
-    owner,
-    repo,
-    sha,
-  });
+// const getPR = async (octokit) => {
+//   const PRS = await octokit.repos.listPullRequestsAssociatedWithCommit({
+//     owner,
+//     repo,
+//     sha,
+//   });
 
-  console.log(PRS);
-};
+//   console.log(PRS);
+// };
 
 try {
   const CHANGELOGS = JSON.parse(core.getInput('changelogs'));
   // const modifiedFiles = JSON.parse(core.getInput('modifiedFiles'));
 
   const token = JSON.parse(core.getInput('token', { required: true }));
-  const octokit = new GitHub(token);
+  console.log(token);
 
-  getPR(octokit);
+  const octokit = new GitHub(token);
+  console.log(octokit);
+
+
+  // getPR(octokit);
 
   // Not do anything if -Changelog is a commit message
   const ignoreAction = context.payload.commits
