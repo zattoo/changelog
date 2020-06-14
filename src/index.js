@@ -10,7 +10,7 @@ const owner = repo.owner;
 
 try {
   const CHANGELOGS = JSON.parse(core.getInput('changelogs'));
-  const modifiedFiles = JSON.parse(core.getInput('changelogs'));
+  const modifiedFiles = JSON.parse(core.getInput('modifiedFiles'));
   console.log(modifiedFiles);
 
   // Not do anything if -Changelog is a commit message
