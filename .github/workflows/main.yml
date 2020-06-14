@@ -13,6 +13,7 @@ jobs:
           for changed_file in ${{ steps.file_changes.outputs.files }}; do
             echo "Do something with this ${changed_file}."
           done
+      - id: setPR
       - run: |
         echo "::set-env name=PR_NUMBER::$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
       - name: Use changelog-validate action
