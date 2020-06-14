@@ -12,26 +12,32 @@ const run = async () => {
     const ingnoreActionMessage = core.getInput('ignoreActionMessage');
     const octokit = getOctokit(token);
 
+    const repo = context.payload.repository.name;
+    const owner = context.payload.repository.full_name.split('/')[0];
+    const pullNumber = context.payload.pull_request.number;
+
+    const commits = await octokit.pulls.listCommits({
+      owner,
+      repo,
+      pull_number: pullNumber,
+    });
+
     // Not do anything if -Changelog is a commit message
-    const ignoreAction = context.payload.commits
-      .some((commit) => commit.message === ingnoreActionMessage);
+    const ignoreAction = commits.data
+      .some((c) => c.commit.message === ingnoreActionMessage);
     if (ignoreAction) {
-      console.log(`Exit the action due to message with ${ingnoreActionMessage}`);
+      core.info(`Exit the action due to message with ${ingnoreActionMessage}`);
       process.exit(0);
     }
 
-    const repo = context.payload.repository.name;
-    const owner = context.payload.repository.owner.name;
-    const { sha } = context;
-
-    const modifiedFiles = await getModifiedFiles(octokit, repo, owner, sha);
+    const modifiedFiles = await getModifiedFiles(octokit, repo, owner, pullNumber);
 
     changelogs.forEach((changelog) => {
       // Check if at least one file was modified in the watchFolder
       if (modifiedFiles.some((filename) => filename.startsWith(changelog.watchFolder))) {
         // Check if changelog is in the modified files
         if (!modifiedFiles.includes(changelog.file)) {
-          core.warning(`Files in ${changelog.watchFolder} have been modified but ${changelog.file} was not modified`);
+          core.setFailed(`Files in ${changelog.watchFolder} have been modified but ${changelog.file} was not modified`);
         }
       }
 
@@ -39,6 +45,7 @@ const run = async () => {
       validateChangelog(changelogContent);
     });
   } catch (error) {
+    console.log(error);
     core.setFailed(error.message);
   }
 };
