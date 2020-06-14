@@ -17,6 +17,8 @@ const run = async () => {
     const PR = context.payload.pull_request.number;
     // const { sha } = context;
 
+    console.log(repo, owner, PR);
+
     const commits = await octokit.pulls.listCommits({
       owner,
       repo,
