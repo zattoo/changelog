@@ -12,6 +12,8 @@ const run = async () => {
     const ingnoreActionMessage = core.getInput('ignoreActionMessage');
     const octokit = getOctokit(token);
 
+    console.log(ingnoreActionMessage);
+
     const repo = context.payload.repository.name;
     const owner = context.payload.repository.full_name.split('/')[0];
     const pullNumber = context.payload.pull_request.number;
