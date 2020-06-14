@@ -12,6 +12,8 @@ const run = async () => {
     const ingnoreActionMessage = core.getInput('ignoreActionMessage');
     const octokit = getOctokit(token);
 
+    console.log(context);
+
     // Not do anything if -Changelog is a commit message
     const ignoreAction = context.payload.commits
       .some((commit) => commit.message === ingnoreActionMessage);
