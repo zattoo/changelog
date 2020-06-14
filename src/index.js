@@ -12,19 +12,25 @@ const run = async () => {
     const ingnoreActionMessage = core.getInput('ignoreActionMessage');
     const octokit = getOctokit(token);
 
+    const repo = context.payload.repository.name;
+    const owner = context.payload.repository.owner.name;
+    const PR = context.payload.pull_request.number;
+    // const { sha } = context;
+
+    const commits = await octokit.pulls.listCommits({
+      owner,
+      repo,
+      pull_number: PR,
+    });
+
     // Not do anything if -Changelog is a commit message
-    const ignoreAction = context.payload.commits
+    const ignoreAction = commits.data
       .some((commit) => commit.message === ingnoreActionMessage);
     if (ignoreAction) {
-      console.log(`Exit the action due to message with ${ingnoreActionMessage}`);
+      core.info(`Exit the action due to message with ${ingnoreActionMessage}`);
       process.exit(0);
     }
 
-    const repo = context.payload.repository.name;
-    const owner = context.payload.repository.owner.name;
-    // const { sha } = context;
-
-    const PR = context.payload.pull_request.number;
     const modifiedFiles = await getModifiedFiles(octokit, repo, owner, PR);
 
     changelogs.forEach((changelog) => {
@@ -40,7 +46,7 @@ const run = async () => {
       validateChangelog(changelogContent);
     });
   } catch (error) {
-    console.log(error);
+    core.debug(error);
     core.setFailed(error.message);
   }
 };
