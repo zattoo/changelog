@@ -13,6 +13,8 @@ try {
   const modifiedFiles = JSON.parse(core.getInput('modifiedFiles'));
   console.log(modifiedFiles);
 
+  console.log(process.env);
+
   // Not do anything if -Changelog is a commit message
   const ignoreAction = context.payload.commits.some(commit => commit.message === ingnoreActionMessage)
   if (ignoreAction) {
