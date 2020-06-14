@@ -9,7 +9,7 @@ const run = async () => {
   try {
     const token = core.getInput('token', { required: true });
     const changelogs = JSON.parse(core.getInput('changelogs', { required: true }));
-    const ingnoreActionMessage = core.getInput('ingnoreActionMessage');
+    const ingnoreActionMessage = core.getInput('ignoreActionMessage');
     const octokit = getOctokit(token);
 
     // Not do anything if -Changelog is a commit message
@@ -24,18 +24,20 @@ const run = async () => {
     const owner = context.payload.repository.owner.name;
     const { sha } = context;
 
-    const files = await getModifiedFiles(octokit, repo, owner, sha);
-    console.log(files);
+    const modifiedFiles = await getModifiedFiles(octokit, repo, owner, sha);
 
     changelogs.forEach((changelog) => {
-      // TODO: For each watchFolder check if it has modified files
-      // If it has, verify the changelog
-      // If is not modified warn it
+      // Check if at least one file was modified in the watchFolder
+      if (modifiedFiles.some((filename) => filename.startsWith(changelog.watchFolder))) {
+        // Check if changelog is in the modified files
+        if (!modifiedFiles.includes(changelog.file)) {
+          core.warning(`Files in ${changelog.watchFolder} have been modified but ${changelog.file} was not modified`);
+        }
+      }
+
       const changelogContent = fs.readFileSync(changelog.file, { encoding: 'utf-8' });
       validateChangelog(changelogContent);
     });
-
-    console.log(`The event context: ${JSON.stringify(context, undefined, 2)}`);
   } catch (error) {
     core.setFailed(error.message);
   }

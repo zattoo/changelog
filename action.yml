@@ -9,10 +9,10 @@ inputs:
     required: true
   modifiedFiles:
     description: 'Array with all modified files'
-    reequired: true
-  ingnoreActionMessage:
+    required: true
+  ignoreActionMessage:
     description: 'Commit message to avoid executing the action'
-    reequired: false
+    required: false
     default: '-Changelog'
 runs:
   using: 'node12'
