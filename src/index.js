@@ -10,13 +10,15 @@ const { owner } = context.payload;
 const { sha } = context.payload;
 
 const getPR = async (octokit) => {
-  const PRS = await octokit.repos.listPullRequestsAssociatedWithCommit({
-    owner,
-    repo,
-    sha,
-  });
 
-  console.log(PRS);
+  console.log(repo, owner, sha);
+  // const PRS = await octokit.repos.listPullRequestsAssociatedWithCommit({
+  //   owner,
+  //   repo,
+  //   sha,
+  // });
+
+  // console.log(PRS);
 };
 
 try {
