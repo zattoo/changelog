@@ -6,10 +6,14 @@ const { validateChangelog } = require('./validate');
 
 const ingnoreActionMessage = '-Changelog'; // ToDo: make it customizable
 
-const repo = context.payload.repository.name;
-const owner = context.payload.owner.name;
-const { sha } = context.payload.sha;
-console.log(repo, owner, sha);
+// const repo = context.payload.repository.name;
+// const owner = context.payload.owner.name;
+// const sha = context.payload.sha;
+
+console.log(Object.keys(context.payload));
+console.log(JSON.stringify(context, null, 2));
+
+// console.log(repo, owner, sha);
 
 // const getPR = () => {
 //   // const PRS = await octokit.repos.listPullRequestsAssociatedWithCommit({
