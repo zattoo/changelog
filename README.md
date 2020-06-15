@@ -1,5 +1,5 @@
 # 📋 Changelog Validate 
-GitHub Action to validate CHANGELOG.md files and indicate if the changelog should have modification based on watch folders.
+GitHub Action to validate CHANGELOG.md files and indicate if the changelog should be modified based on watch folders.
 
 ## Validations:
   - A h1 title must be present
