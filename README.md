@@ -1,5 +1,29 @@
-# Changelog Validate 📋
-GitHub Action to validate CHANGELOG.md files and notify in the case that needs to be modified.
+# 📋 Changelog Validate 
+GitHub Action to validate CHANGELOG.md files and indicate if the changelog should have modification based on watch folders.
+
+## Validations:
+  - A h1 title must be present
+  - Ony one h1 heading
+  - Only one h2 with unreleased is allowed
+  - h2 should contain a valid version or be unreleased
+  - Versions should be in decremental order from top to bottom
+  - It cannot contain two equal versions
+  - Titles should have a correct number of spaces
+  - H3 headings must be of a valid type
+    - Added
+    - Changed
+    - Deprecated
+    - Removed
+    - Fixed
+    - Security
+    - Infrastructure
+    - Updated
+  
+To avoid doing checks a commit with the message `-Changelog` should be in the pull request.
+
+```bash
+$ git commit --allow-empty -m "-Changelog"
+```
 
 ## Inputs
 
