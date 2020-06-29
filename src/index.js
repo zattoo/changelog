@@ -15,13 +15,11 @@ const run = async () => {
     const repo = context.payload.repository.name;
     const owner = context.payload.repository.full_name.split('/')[0];
     const pullNumber = context.payload.pull_request.number;
-
     const labels = context.payload.pull_request.labels.map((label) => label.name);
 
-    console.log(JSON.stringify(context.payload, null, 2));
-
+    // Ignore the action if -Changelog label (or custom name) exists
     if (labels.includes(ingnoreActionMessage)) {
-      core.info(`Exit the action due to message with ${ingnoreActionMessage}`);
+      core.info(`Ignore the action due to label ${ingnoreActionMessage}`);
       process.exit(0);
     }
 
