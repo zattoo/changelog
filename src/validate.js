@@ -118,7 +118,6 @@ const validateH2 = (text) => {
   }
 
   let previousVersion;
-  let previousDate;
   headings.forEach((heading) => {
     /** @see https://regex101.com/r/v5VmTx/2 */
     const [, unreleased, version, date] = heading.match(reH2) || [];
@@ -130,12 +129,6 @@ const validateH2 = (text) => {
       if (!date) {
         throw new Error(`A date is required for version "${heading}"`);
       }
-      const currentDate = validateDate(date);
-
-      if (previousDate && (previousDate < currentDate)) {
-        throw new Error(`The previous release "${new Date(previousDate).toLocaleDateString()}" can't be older than "${new Date(currentDate).toLocaleDateString()}"`);
-      }
-      previousDate = currentDate;
     }
 
     if (previousVersion && currentVersion) {
