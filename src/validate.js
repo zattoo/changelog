@@ -10,6 +10,13 @@ const changeTypes = [
 ];
 
 /**
+ * Obtains the version and date of the given heading
+ * Capture Group 1: Version | Unreleased
+ * Capture Group 2: Date | Unreleased
+ */
+const reH3 = /^##\s\[?(Unreleased)\]?|^##\s\[((?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-(?:(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?:[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)\] - (Unreleased|(?:\d\d?\d?\d?[-/.]\d\d?[-/.]\d\d?\d?\d))$/;
+
+/**
  * Validades if the given text heading
  * has invalid spaces
  * @param {string} text
@@ -96,6 +103,13 @@ const validateDate = (date) => {
   throw new Error(`Invalid ${date}`);
 };
 
+const isUnreleased = (unreleased, date) => Boolean(unreleased) || date === 'Unreleased';
+
+/**
+ * Validate H2 headings
+ * @param {string} text
+ * @returns {object}
+ */
 const validateH2 = (text) => {
   const headings = text.match(/^##\s.*$/gm) || [];
 
@@ -107,13 +121,12 @@ const validateH2 = (text) => {
   let previousDate;
   headings.forEach((heading) => {
     /** @see https://regex101.com/r/v5VmTx/2 */
-    const [, unreleased, version, date] = heading.match(/^##\s\[?(Unreleased)\]?|^##\s\[((?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-(?:(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?:[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)\] - (Unreleased|(?:\d\d?\d?\d?[-/.]\d\d?[-/.]\d\d?\d?\d))$/) || [];
+    const [, unreleased, version, date] = heading.match(reH3) || [];
 
-    const isUnreleased = Boolean(unreleased) || date === 'Unreleased';
     const currentVersion = version;
 
     // Check if the date is valid
-    if (!isUnreleased) {
+    if (!isUnreleased(unreleased, date)) {
       if (!date) {
         throw new Error(`A date is required for ${heading}`);
       }
@@ -139,13 +152,21 @@ const validateH2 = (text) => {
       previousVersion = currentVersion;
     }
   });
+
+  // Return the newest heading information
+  const [, unreleased, version, date] = headings[0].match(reH3) || [];
+  return {
+    isUnreleased: isUnreleased(unreleased, date),
+    version,
+    date,
+  };
 };
 
 const validateChangelog = (text) => {
   validateH1(text);
-  validateH2(text);
+  const newestHeading = validateH2(text);
   validateH3(text);
-  return true;
+  return newestHeading;
 };
 
 module.exports = {
