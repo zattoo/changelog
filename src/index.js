@@ -31,6 +31,7 @@ const run = async () => {
       if (modifiedFiles.some((filename) => filename.startsWith(watchFolder))) {
         // Check if changelog is in the modified files
         if (!modifiedFiles.includes(changelog)) {
+          console.log(modifiedFiles)
           throw new Error(`Files in ${watchFolder} have been modified but ${changelog} was not modified`);
         }
       }
