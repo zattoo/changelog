@@ -4,8 +4,8 @@ inputs:
   token:
     description: 'GitHub token'
     required: true
-  changelogs: 
-    description: 'Array with all Changelogs in the project'
+  files:
+    description: 'Array with the files to check'
     required: true
   modifiedFiles:
     description: 'Array with all modified files'
