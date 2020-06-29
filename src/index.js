@@ -18,8 +18,6 @@ const run = async () => {
     const labels = context.payload.pull_request.labels.map((label) => label.name);
     const branch = context.payload.pull_request.head.ref;
 
-    console.log({ branch });
-
     // Ignore the action if -Changelog label (or custom name) exists
     if (labels.includes(ingnoreActionMessage)) {
       core.info(`Ignore the action due to label ${ingnoreActionMessage}`);
@@ -28,12 +26,12 @@ const run = async () => {
 
     const modifiedFiles = await getModifiedFiles(octokit, repo, owner, pullNumber);
 
-    files.forEach((changelog) => {
+    files.forEach((files) => {
       // Check if at least one file was modified in the watchFolder
-      if (modifiedFiles.some((filename) => filename.startsWith(changelog.watchFolder))) {
+      if (modifiedFiles.some((filename) => filename.startsWith(files.watchFolder))) {
         // Check if changelog is in the modified files
-        if (!modifiedFiles.includes(changelog.changelog)) {
-          core.setFailed(`Files in ${changelog.watchFolder} have been modified but ${changelog.file} was not modified`);
+        if (!modifiedFiles.includes(files.changelog)) {
+          core.setFailed(`Files in ${files.watchFolder} have been modified but ${files.changelog} was not modified`);
         }
 
         // If the branch is release check if it has a package.json with a version the same as the fist H3
@@ -43,7 +41,7 @@ const run = async () => {
         }
       }
 
-      const changelogContent = fs.readFileSync(changelog.file, { encoding: 'utf-8' });
+      const changelogContent = fs.readFileSync(files.changelog, { encoding: 'utf-8' });
       validateChangelog(changelogContent);
     });
   } catch (error) {
