@@ -1,11 +1,13 @@
-# 📋 Changelog Validate 
+# 📋 Changelog Validate
 GitHub Action to validate CHANGELOG.md files and indicate if the changelog should be modified based on watch folders.
 
 ## Validations:
   - A h1 title must be present
   - Ony one h1 heading
   - Only one h2 with unreleased is allowed
-  - h2 should contain a valid version or be unreleased
+  - H2 should contain a valid version or be unreleased
+  - H2 heading should have a proper SemVer
+  - H2 Should have valid dates
   - Versions should be in decremental order from top to bottom
   - It cannot contain two equal versions
   - Titles should have a correct number of spaces
@@ -18,7 +20,11 @@ GitHub Action to validate CHANGELOG.md files and indicate if the changelog shoul
     - Security
     - Infrastructure
     - Updated
-  
+  - For "release" branch
+    - Should have a valid date
+    - Version should match package.json and package-lock.json
+    - Can't be "Unreleased"
+
 To avoid doing checks a commit with the message `-Changelog` should be in the pull request.
 
 ```bash
@@ -33,17 +39,18 @@ $ git commit --allow-empty -m "-Changelog"
 
 Required. GitHub token
 
-### `changelogs`
+### `files`
 
 `json string`
 
-Required. Array with all changelogs and the folder that needs to be checked for changes
+Required. Array with all changelogs, packages.json files and the folder that needs to be checked for changes
+Example : '[{"watchFolder": "examples", "changelog": "examples/CHANGELOG.md", "package": "package.json"}]'
 
 ### `ignoreActionMessage`
 
 `string`,  default: `-Changelog`
 
-Commit message to avoid executing the action
+Pull request label name to avoid executing the action
 
 ## Usage Example
 
@@ -61,4 +68,4 @@ jobs:
         uses: dobladov/changelog-validate
         with:
           token: ${{ github.token }}
-          changelogs: '[{"watchFolder": "examples", "file": "examples/CHANGELOG.md"}]'
+          files: '[{"watchFolder": "examples", "changelog": "examples/CHANGELOG.md", "package": "package.json"}]'
