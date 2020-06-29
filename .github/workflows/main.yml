@@ -11,6 +11,6 @@ jobs:
         uses: ./ # Uses an action in the root directory
         with:
           token: ${{ github.token }}
-          changelogs: '[{"watchFolder": "examples", "file": "examples/CHANGELOG.md"}]'
+          files: '[{"watchFolder": "examples", "changelog": "examples/CHANGELOG.md", "package": "package.json"}]'
 
 
