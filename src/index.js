@@ -26,23 +26,42 @@ const run = async () => {
 
     const modifiedFiles = await getModifiedFiles(octokit, repo, owner, pullNumber);
 
-    files.forEach((files) => {
+    files.forEach(({changelog, watchFolder, package}) => {
       // Check if at least one file was modified in the watchFolder
-      if (modifiedFiles.some((filename) => filename.startsWith(files.watchFolder))) {
+      if (modifiedFiles.some((filename) => filename.startsWith(watchFolder))) {
         // Check if changelog is in the modified files
-        if (!modifiedFiles.includes(files.changelog)) {
-          core.setFailed(`Files in ${files.watchFolder} have been modified but ${files.changelog} was not modified`);
-        }
-
-        // If the branch is release check if it has a package.json with a version the same as the fist H3
-        // and a valid date
-        if (branch === 'release') {
-          console.log('BRANCH IS RELEASE');
+        if (!modifiedFiles.includes(changelog)) {
+          throw new Error(`Files in ${watchFolder} have been modified but ${changelog} was not modified`);
         }
       }
 
-      const changelogContent = fs.readFileSync(files.changelog, { encoding: 'utf-8' });
-      validateChangelog(changelogContent);
+      const changelogContent = fs.readFileSync(changelog, { encoding: 'utf-8' });
+      const {isUnreleased, version, date} = validateChangelog(changelogContent);
+
+      // If the branch is release check if it has a package.json with a version the same as the fist H3
+      // and a valid date
+      if (branch === 'release') {
+        if (isUnreleased) {
+          throw new Error(`A release branch can't be unreleased`);
+        }
+
+        if (!version || version === 'Unreleased') {
+          throw new Error('A release branch should have a version')
+        }
+
+        if (!date) {
+          throw new Error('A release branch should have a date')
+        }
+
+        if (package) {
+          const {version: packageVersion} = JSON.parse(fs.readFileSync(package, { encoding: 'utf-8' }));
+          // TODO: Check package-lock too
+
+          if (packageVersion !== version) {
+            throw new Error(`The package version "${packageVersion}" does not match the latest version "${version}"`)
+          }
+        }
+      }
     });
   } catch (error) {
     console.log(error);
