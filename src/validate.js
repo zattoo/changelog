@@ -30,11 +30,11 @@ const validateH1 = (text) => {
   const titles = text.match(/^#(\s*\w*)$/gm) || [];
 
   if (titles.length === 0) {
-    throw (new Error('No title is present'));
+    throw new Error('No title is present');
   } else if (titles.length > 1) {
-    throw (new Error('Only one title is allowed'));
-  } else if (!checkHeadingSpaces(titles.slice(0, 1), 1)) {
-    throw (new Error('Title has more than one space'));
+    throw new Error('Only one title is allowed');
+  } else if (!checkHeadingSpaces(String(titles.slice(0, 1)), 1)) {
+    throw new Error('Title has more than one space');
   }
 };
 
@@ -49,7 +49,7 @@ const validateH1 = (text) => {
 const compareSemVer = (a, b) => {
   const pa = a.split('.');
   const pb = b.split('.');
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < 3; i += 1) {
     const na = Number(pa[i]);
     const nb = Number(pb[i]);
     if (na > nb) return 1;
@@ -71,40 +71,67 @@ const validateH3 = (text) => {
     const regex = new RegExp(re, 'g');
 
     if (!regex.test(heading)) {
-      throw (new Error(`${heading} is not a valid change type`));
+      throw new Error(`${heading} is not a valid change type`);
     } else if (!checkHeadingSpaces(heading, 3)) {
-      throw (new Error(`${heading} has incorrect spaces`));
+      throw new Error(`${heading} has incorrect spaces`);
     }
   });
+};
+
+/**
+ * Validate if the given date is correct
+ * @param {string} date
+ */
+const validateDate = (date) => {
+  const [year, month, day] = date.replace(/\./g, '-').split('-');
+
+  const newDate = (Number(year) < 1000)
+    ? Date.parse(`${day}-${month}-${year}`)
+    : Date.parse(`${year}-${month}-${day}`);
+
+  if (newDate) {
+    return newDate;
+  }
+
+  throw new Error(`Invalid ${date}`);
 };
 
 const validateH2 = (text) => {
   const headings = text.match(/^##\s.*$/gm) || [];
 
   if (headings.filter((heading) => heading.toLowerCase().includes('unreleased')).length > 1) {
-    throw (new Error('Only one unreleased heading is allowed'));
+    throw new Error('Only one unreleased heading is allowed');
   }
 
   let previousVersion;
+  let previousDate;
   headings.forEach((heading) => {
-    const [, currentVersion] = heading.match(/^##\s\[(\d+.\d+.\d+)\]/) || [];
+    /** @see https://regex101.com/r/v5VmTx/2 */
+    const [, unreleased, version, date] = heading.match(/^##\s\[?(Unreleased)\]?|^##\s\[((?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-(?:(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?:[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)\] - (Unreleased|(?:\d\d?\d?\d?[-/.]\d\d?[-/.]\d\d?\d?\d))$/) || [];
 
-    if (
-      !/^##\s\[*Unreleased\]*$/gm.test(heading)
-            && !/^##\s\[\d+.\d+.\d+\] - (\d+.\d+.\d+|\[*Unreleased\]*)$/gm.test(text)
-    ) {
-      throw (new Error(`${heading} is not valid`));
-    } else if (!checkHeadingSpaces(heading, 2)) {
-      throw (new Error(`${heading} has incorrect spaces`));
+    const isUnreleased = Boolean(unreleased) || date === 'Unreleased';
+    const currentVersion = version;
+
+    // Check if the date is valid
+    if (!isUnreleased) {
+      if (!date) {
+        throw new Error(`A date is required for ${heading}`);
+      }
+      const currentDate = validateDate(date);
+
+      if (previousDate && (previousDate < currentDate)) {
+        throw new Error(`The previous release "${new Date(previousDate).toLocaleDateString()}" can't be older than "${new Date(currentDate).toLocaleDateString()}"`);
+      }
+      previousDate = currentDate;
     }
 
     if (previousVersion && currentVersion) {
       const compare = compareSemVer(previousVersion, currentVersion);
 
       if (previousVersion === currentVersion) {
-        throw (new Error(`Version ${previousVersion} can't be the same as a previous version ${currentVersion}`));
+        throw new Error(`Version ${previousVersion} can't be the same as a previous version ${currentVersion}`);
       } else if (compare === -1) {
-        throw (new Error(`Version ${previousVersion} can't be smaller than a previous version ${currentVersion}`));
+        throw new Error(`Version ${previousVersion} can't be smaller than a previous version ${currentVersion}`);
       }
     }
 
