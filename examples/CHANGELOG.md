@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 
-## [3.2026.1] - 29.06.2020
+## [1.0.0] - 29.06.2020
 
 ### Added
 - New functionality
@@ -12,7 +12,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 - Update libs
 - Pass new value to function
 
-## [3.2026.0] - 20.05.2020
+## [0.0.1] - 20.05.2020
 
 ### Added
 - Some cool stuff
