@@ -16,19 +16,11 @@ const run = async () => {
     const owner = context.payload.repository.full_name.split('/')[0];
     const pullNumber = context.payload.pull_request.number;
 
-    console.log(context.payload.pull_request);
+    const labels = context.payload.pull_request.labels.map((label) => label.name);
 
-    // const commits = await octokit.pulls.listCommits({
-    //   owner,
-    //   repo,
-    //   pull_number: pullNumber,
-    // });
+    console.log(JSON.stringify(context.payload, null, 2));
 
-    // Get the labels for the PR, if is the same as ignoreActionMessage do nothing
-    // Not do anything if -Changelog (Or custom) is a commit message
-    // const ignoreAction = commits.data
-    //   .some((c) => c.commit.message === ingnoreActionMessage);
-    if (false) {
+    if (labels.includes(ingnoreActionMessage)) {
       core.info(`Exit the action due to message with ${ingnoreActionMessage}`);
       process.exit(0);
     }
