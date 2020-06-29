@@ -14,7 +14,7 @@ const changeTypes = [
  * Capture Group 1: Version | Unreleased
  * Capture Group 2: Date | Unreleased
  */
-const reH3 = /^##\s\[?(Unreleased)\]?|^##\s\[((?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-(?:(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?:[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)\] - (Unreleased|(?:\d\d?\d?\d?[-/.]\d\d?[-/.]\d\d?\d?\d))$/;
+const reH2 = /^##\s\[?(Unreleased)\]?|^##\s\[((?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-(?:(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?:[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)\] - (Unreleased|(?:\d\d?\d?\d?[-/.]\d\d?[-/.]\d\d?\d?\d))$/;
 
 /**
  * Validades if the given text heading
@@ -34,7 +34,7 @@ const checkHeadingSpaces = (text, level) => {
  * @param {string} text
  */
 const validateH1 = (text) => {
-  const titles = text.match(/^#(\s*\w*)$/gm) || [];
+  const titles = text.match(/^#[ ]{1,}.+$/gm) || [];
 
   if (titles.length === 0) {
     throw new Error('No title is present');
@@ -100,7 +100,7 @@ const validateDate = (date) => {
     return newDate;
   }
 
-  throw new Error(`Invalid ${date}`);
+  throw new Error(`Invalid date "${date}"`);
 };
 
 const isUnreleased = (unreleased, date) => Boolean(unreleased) || date === 'Unreleased';
@@ -121,14 +121,14 @@ const validateH2 = (text) => {
   let previousDate;
   headings.forEach((heading) => {
     /** @see https://regex101.com/r/v5VmTx/2 */
-    const [, unreleased, version, date] = heading.match(reH3) || [];
+    const [, unreleased, version, date] = heading.match(reH2) || [];
 
     const currentVersion = version;
 
     // Check if the date is valid
     if (!isUnreleased(unreleased, date)) {
       if (!date) {
-        throw new Error(`A date is required for ${heading}`);
+        throw new Error(`A date is required for version "${heading}"`);
       }
       const currentDate = validateDate(date);
 
@@ -142,9 +142,9 @@ const validateH2 = (text) => {
       const compare = compareSemVer(previousVersion, currentVersion);
 
       if (previousVersion === currentVersion) {
-        throw new Error(`Version ${previousVersion} can't be the same as a previous version ${currentVersion}`);
+        throw new Error(`Version ${previousVersion} can't be the same as a previous version`);
       } else if (compare === -1) {
-        throw new Error(`Version ${previousVersion} can't be smaller than a previous version ${currentVersion}`);
+        throw new Error(`Version ${previousVersion} can't be smaller than a previous version`);
       }
     }
 
@@ -154,7 +154,7 @@ const validateH2 = (text) => {
   });
 
   // Return the newest heading information
-  const [, unreleased, version, date] = headings[0].match(reH3) || [];
+  const [, unreleased, version, date] = headings[0].match(reH2) || [];
   return {
     isUnreleased: isUnreleased(unreleased, date),
     version,
@@ -170,5 +170,8 @@ const validateChangelog = (text) => {
 };
 
 module.exports = {
+  checkHeadingSpaces,
+  compareSemVer,
   validateChangelog,
+  validateDate,
 };
