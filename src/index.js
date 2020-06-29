@@ -26,41 +26,38 @@ const run = async () => {
 
     const modifiedFiles = await getModifiedFiles(octokit, repo, owner, pullNumber);
 
-    files.forEach(({changelog, watchFolder, package}) => {
+    files.forEach(({ changelog, watchFolder, packageFile }) => {
       // Check if at least one file was modified in the watchFolder
       if (modifiedFiles.some((filename) => filename.startsWith(watchFolder))) {
         // Check if changelog is in the modified files
         if (!modifiedFiles.includes(changelog)) {
-          console.log(modifiedFiles)
-          // throw new Error(`Files in ${watchFolder} have been modified but ${changelog} was not modified`);
+          throw new Error(`Files in ${watchFolder} have been modified but ${changelog} was not modified`);
         }
       }
 
       const changelogContent = fs.readFileSync(changelog, { encoding: 'utf-8' });
-      const {isUnreleased, version, date} = validateChangelog(changelogContent);
+      const { isUnreleased, version, date } = validateChangelog(changelogContent);
 
-      // If the branch is release check if it has a package.json with a version the same as the fist H3
-      // and a valid date
+      // Checks if the branch is release
       if (branch === 'release') {
-        console.log({isUnreleased, version, date})
         if (isUnreleased) {
-          throw new Error(`A release branch can't be unreleased`);
+          throw new Error('A release branch can\'t be unreleased');
         }
 
         if (!version || version === 'Unreleased') {
-          throw new Error('A release branch should have a version')
+          throw new Error('A release branch should have a version');
         }
 
         if (!date) {
-          throw new Error('A release branch should have a date')
+          throw new Error('A release branch should have a date');
         }
 
-        if (package) {
-          const {version: packageVersion} = JSON.parse(fs.readFileSync(package, { encoding: 'utf-8' }));
-          // TODO: Check package-lock too
+        if (packageFile) {
+          const { version: packageVersion } = JSON.parse(fs.readFileSync(packageFile, { encoding: 'utf-8' }));
+          const { version: packageLockVersion } = JSON.parse(fs.readFileSync(packageFile.replace('.json', '-lock.json'), { encoding: 'utf-8' }));
 
-          if (packageVersion !== version) {
-            throw new Error(`The package version "${packageVersion}" does not match the latest version "${version}"`)
+          if (packageVersion !== version || packageLockVersion !== version) {
+            throw new Error(`The package version "${packageVersion}" does not match the newest version "${version}"`);
           }
         }
       }
