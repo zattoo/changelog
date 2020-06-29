@@ -42,6 +42,7 @@ const run = async () => {
       // If the branch is release check if it has a package.json with a version the same as the fist H3
       // and a valid date
       if (branch === 'release') {
+        console.log({isUnreleased, version, date})
         if (isUnreleased) {
           throw new Error(`A release branch can't be unreleased`);
         }
