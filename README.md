@@ -40,7 +40,7 @@ Required. GitHub token
 `string`
 
 Optional. Comma separated string with all the directories to watch
-Example : './'
+Example : 'src/example'
 
 ### `ignoreActionLabel`
 
@@ -64,4 +64,4 @@ jobs:
         uses: zattoo/changelog
         with:
           token: ${{ github.token }}
-          sources: './'
+          sources: 'src/example'
