@@ -27,6 +27,8 @@ const run = async () => {
 
     const modifiedFiles = await getModifiedFiles(octokit, repo, owner, pullNumber);
 
+    console.log({modifiedFiles})
+
     sources.forEach((folder) => {
       // Check if at least one file was modified in the watchFolder
       if (modifiedFiles.some((filename) => filename.startsWith(folder))) {
