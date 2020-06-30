@@ -3,14 +3,14 @@ GitHub Action to validate CHANGELOG.md files and indicate if the changelog shoul
 
 ## Validations:
   - A h1 title must be present
-  - Ony one h1 heading
+  - Only one h1 heading
   - Only one h2 with unreleased is allowed
   - H2 should contain a valid version or be unreleased
   - H2 heading should have a proper SemVer
   - H2 Should have valid dates
   - Versions should be in decremental order from top to bottom
   - It cannot contain two equal versions
-  - Titles should have a correct number of spaces
+  - Headings should have a correct number of spaces
   - H3 headings must be of a valid type
     - Added
     - Changed
@@ -25,7 +25,7 @@ GitHub Action to validate CHANGELOG.md files and indicate if the changelog shoul
     - Version should match package.json and package-lock.json
     - Can't be "Unreleased"
 
-To avoid doing checks a commit with the message `-Changelog` should be in the pull request.
+To avoid doing checks a label with the message `-Changelog` should be in the pull request.
 
 ```bash
 $ git commit --allow-empty -m "-Changelog"
