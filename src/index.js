@@ -70,6 +70,7 @@ const run = async () => {
       sha,
       state: 'error',
       description: error.message,
+      context: 'Changelog-validate',
     });
     core.setFailed(error.message);
   }
