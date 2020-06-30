@@ -7002,12 +7002,11 @@ const run = async () => {
     console.log({ modifiedFiles });
 
     sources.forEach((folder) => {
-      console.log({ folder });
       // Check if at least one file was modified in the watchFolder
       if (folder === '*' || modifiedFiles.some((filename) => filename.startsWith(folder))) {
         // Check if changelog is in the modified files
         if (!modifiedFiles.includes(`${folder === '*' ? '' : folder}CHANGELOG.md`)) {
-          throw new Error(`Files in "${folder === '*' ? 'root' : folder}" have been modified but "${folder}CHANGELOG.md" was not modified`);
+          throw new Error(`Files in "${folder === '*' ? 'root' : folder}" have been modified but "${folder === '*' ? '' : folder}CHANGELOG.md" was not modified`);
         }
       }
 
