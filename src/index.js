@@ -8,8 +8,8 @@ const { getModifiedFiles } = require('./files');
 const run = async () => {
   const token = core.getInput('token', { required: true });
   const octokit = getOctokit(token);
-  const files = JSON.parse(core.getInput('files', { required: true }));
-  const ingnoreActionMessage = core.getInput('ignoreActionMessage');
+  const sources = core.getInput('sources', { required: true }).split(',');
+  const ignoreActionLabel = core.getInput('ignoreActionLabel');
 
   const repo = context.payload.repository.name;
   const owner = context.payload.repository.full_name.split('/')[0];
@@ -20,23 +20,23 @@ const run = async () => {
 
   try {
     // Ignore the action if -Changelog label (or custom name) exists
-    if (labels.includes(ingnoreActionMessage)) {
-      core.info(`Ignore the action due to label ${ingnoreActionMessage}`);
+    if (labels.includes(ignoreActionLabel)) {
+      core.info(`Ignore the action due to label ${ignoreActionLabel}`);
       process.exit(0);
     }
 
     const modifiedFiles = await getModifiedFiles(octokit, repo, owner, pullNumber);
 
-    files.forEach(({ changelog, watchFolder, packageFile }) => {
+    sources.forEach((folder) => {
       // Check if at least one file was modified in the watchFolder
-      if (modifiedFiles.some((filename) => filename.startsWith(watchFolder))) {
+      if (modifiedFiles.some((filename) => filename.startsWith(folder))) {
         // Check if changelog is in the modified files
-        if (!modifiedFiles.includes(changelog)) {
-          throw new Error(`Files in ${watchFolder} have been modified but ${changelog} was not modified`);
+        if (!modifiedFiles.includes(`${folder}CHANGELOG.md`)) {
+          throw new Error(`Files in "${folder}" have been modified but "${folder}CHANGELOG.md" was not modified`);
         }
       }
 
-      const changelogContent = fs.readFileSync(changelog, { encoding: 'utf-8' });
+      const changelogContent = fs.readFileSync(`${folder}CHANGELOG.md`, { encoding: 'utf-8' });
       const { isUnreleased, version, date } = validateChangelog(changelogContent);
 
       // Checks if the branch is release
@@ -53,13 +53,11 @@ const run = async () => {
           throw new Error('A release branch should have a date');
         }
 
-        if (packageFile) {
-          const { version: packageVersion } = JSON.parse(fs.readFileSync(packageFile, { encoding: 'utf-8' }));
-          const { version: packageLockVersion } = JSON.parse(fs.readFileSync(packageFile.replace('.json', '-lock.json'), { encoding: 'utf-8' }));
+        const { version: packageVersion } = JSON.parse(fs.readFileSync(`${folder}package.json`, { encoding: 'utf-8' }));
+        const { version: packageLockVersion } = JSON.parse(fs.readFileSync(`${folder}package-lock.json`, { encoding: 'utf-8' }));
 
-          if (packageVersion !== version || packageLockVersion !== version) {
-            throw new Error(`The package version "${packageVersion}" does not match the newest version "${version}"`);
-          }
+        if (packageVersion !== version || packageLockVersion !== version) {
+          throw new Error(`The package version "${packageVersion}" does not match the newest version "${version}"`);
         }
       }
     });

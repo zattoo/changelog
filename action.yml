@@ -4,14 +4,11 @@ inputs:
   token:
     description: 'GitHub token'
     required: true
-  files:
-    description: 'Array with the files to check'
-    required: true
-  modifiedFiles:
-    description: 'Array with all modified files'
-    required: true
-  ignoreActionMessage:
-    description: 'Commit message to avoid executing the action'
+  sources:
+    description: 'Comma separated string with the folders to check'
+    default: './'
+  ignoreActionLabel:
+    description: 'Label to avoid executing the action'
     required: false
     default: '-Changelog'
 runs:
