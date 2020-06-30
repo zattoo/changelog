@@ -5,19 +5,19 @@ const { context, getOctokit } = require('@actions/github');
 const { validateChangelog } = require('./validate');
 const { getModifiedFiles } = require('./files');
 
-const token = core.getInput('token', { required: true });
-const octokit = getOctokit(token);
-const files = JSON.parse(core.getInput('files', { required: true }));
-const ingnoreActionMessage = core.getInput('ignoreActionMessage');
-
-const repo = context.payload.repository.name;
-const owner = context.payload.repository.full_name.split('/')[0];
-const pullNumber = context.payload.pull_request.number;
-const labels = context.payload.pull_request.labels.map((label) => label.name);
-const branch = context.payload.pull_request.head.ref;
-const { sha } = context.payload.pull_request.head;
-
 const run = async () => {
+  const token = core.getInput('token', { required: true });
+  const octokit = getOctokit(token);
+  const files = JSON.parse(core.getInput('files', { required: true }));
+  const ingnoreActionMessage = core.getInput('ignoreActionMessage');
+
+  const repo = context.payload.repository.name;
+  const owner = context.payload.repository.full_name.split('/')[0];
+  const pullNumber = context.payload.pull_request.number;
+  const labels = context.payload.pull_request.labels.map((label) => label.name);
+  const branch = context.payload.pull_request.head.ref;
+  const { sha } = context.payload.pull_request.head;
+
   try {
     // Ignore the action if -Changelog label (or custom name) exists
     if (labels.includes(ingnoreActionMessage)) {
@@ -70,7 +70,7 @@ const run = async () => {
       sha,
       state: 'error',
       description: error.message,
-      context: 'Changelog-validate',
+      context: 'Changelog',
     });
     core.setFailed(error.message);
   }

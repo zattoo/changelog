@@ -1,4 +1,4 @@
-# 📋 Changelog Validate
+# 📋 Changelog
 GitHub Action to validate CHANGELOG.md files and indicate if the changelog should be modified based on watch folders.
 
 ## Validations:
@@ -64,8 +64,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Use changelog-validate action
-        uses: dobladov/changelog-validate
+      - name: Use changelog action
+        uses: zattoo/changelog
         with:
           token: ${{ github.token }}
           files: '[{"watchFolder": "examples", "changelog": "examples/CHANGELOG.md", "package": "package.json"}]'
