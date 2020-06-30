@@ -11,8 +11,6 @@ const run = async () => {
   const sources = core.getInput('sources', { required: true }).split(',');
   const ignoreActionLabel = core.getInput('ignoreActionLabel');
 
-  console.log({ sources });
-
   const repo = context.payload.repository.name;
   const owner = context.payload.repository.full_name.split('/')[0];
   const pullNumber = context.payload.pull_request.number;
@@ -28,21 +26,18 @@ const run = async () => {
     }
 
     const modifiedFiles = await getModifiedFiles(octokit, repo, owner, pullNumber);
-    console.log({ modifiedFiles });
 
     sources.forEach((folder) => {
       // Check if at least one file was modified in the watchFolder
-      if (modifiedFiles.some((filename) => filename.startsWith(folder))) {
+      if (folder === '*' || modifiedFiles.some((filename) => filename.startsWith(folder))) {
         // Check if changelog is in the modified files
-        if (!modifiedFiles.includes(`${folder}CHANGELOG.md`)) {
-          throw new Error(`Files in "${folder}" have been modified but "${folder}CHANGELOG.md" was not modified`);
+        if (!modifiedFiles.includes(`${folder === '*' ? '' : folder}CHANGELOG.md`)) {
+          throw new Error(`Files in "${folder === '*' ? 'root' : folder}" have been modified but "${folder === '*' ? '' : folder}CHANGELOG.md" was not modified`);
         }
       }
 
       const changelogContent = fs.readFileSync(`${folder}CHANGELOG.md`, { encoding: 'utf-8' });
       const { isUnreleased, version, date } = validateChangelog(changelogContent);
-
-      console.log(changelogContent);
 
       // Checks if the branch is release
       if (branch === 'release') {
