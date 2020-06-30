@@ -6,7 +6,7 @@ const {
   validateDate,
 } = require('../validate');
 
-const changelogContent = fs.readFileSync('./examples/CHANGELOG.md', { encoding: 'utf-8' });
+const changelogContent = fs.readFileSync('./examples/valid.md', { encoding: 'utf-8' });
 
 describe('validateChangelog', () => {
   it('should be a valid changelog', () => {
