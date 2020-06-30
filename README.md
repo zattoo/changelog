@@ -1,4 +1,4 @@
-# 📋 Changelog Validate
+# 📋 Changelog
 GitHub Action to validate CHANGELOG.md files and indicate if the changelog should be modified based on watch folders.
 
 ## Validations:
@@ -27,10 +27,6 @@ GitHub Action to validate CHANGELOG.md files and indicate if the changelog shoul
 
 To avoid doing checks a label with the message `-Changelog` should be in the pull request.
 
-```bash
-$ git commit --allow-empty -m "-Changelog"
-```
-
 ## Inputs
 
 ### `token`
@@ -39,14 +35,14 @@ $ git commit --allow-empty -m "-Changelog"
 
 Required. GitHub token
 
-### `files`
+### `sources`
 
-`json string`
+`string`
 
-Required. Array with all changelogs, packages.json files and the folder that needs to be checked for changes
-Example : '[{"watchFolder": "examples", "changelog": "examples/CHANGELOG.md", "package": "package.json"}]'
+Optional. Comma separated string with all the directories to watch
+Example : './'
 
-### `ignoreActionMessage`
+### `ignoreActionLabel`
 
 `string`,  default: `-Changelog`
 
@@ -64,8 +60,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Use changelog-validate action
-        uses: dobladov/changelog-validate
+      - name: Use changelog action
+        uses: zattoo/changelog
         with:
           token: ${{ github.token }}
-          files: '[{"watchFolder": "examples", "changelog": "examples/CHANGELOG.md", "package": "package.json"}]'
+          sources: './'

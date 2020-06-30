@@ -7,10 +7,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Use changelog-validate action
+      - name: Use changelog action
         uses: ./ # Uses an action in the root directory
         with:
           token: ${{ github.token }}
-          files: '[{"watchFolder": "examples", "changelog": "examples/CHANGELOG.md", "package": "package.json"}]'
+          sources: './'
 
 

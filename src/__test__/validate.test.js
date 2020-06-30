@@ -108,33 +108,33 @@ describe('validateChangelog', () => {
 describe('compareSemVer', () => {
   const a = '1.0.0';
   const b = '1.0.1';
-  it('shoudl indicate that a is lower than b', () => {
+  it('should indicate that a is lower than b', () => {
     expect(compareSemVer(a, b)).toEqual(-1);
   });
 
-  it('shoudl indicate that b is higher than a', () => {
+  it('should indicate that b is higher than a', () => {
     expect(compareSemVer(b, a)).toEqual(1);
   });
 
-  it('shoudl indicate that a is equal to a', () => {
+  it('should indicate that a is equal to a', () => {
     expect(compareSemVer(a, a)).toEqual(undefined);
   });
 });
 
 describe('validateDate', () => {
-  it('shoudl verify that the date is valid', () => {
+  it('should verify that the date is valid', () => {
     expect(validateDate('2020-05-28')).toEqual(1590624000000);
   });
 
-  it('shoudl verify that the date is valid for different format', () => {
+  it('should verify that the date is valid for different format', () => {
     expect(validateDate('28-05-2020')).toEqual(1590624000000);
   });
 
-  it('shoudl verify that the date is valid with different separator', () => {
+  it('should verify that the date is valid with different separator', () => {
     expect(validateDate('2020.05.28')).toEqual(1590624000000);
   });
 
-  it('shoudl throw error for invalid date', () => {
+  it('should throw error for invalid date', () => {
     try {
       validateDate('2020/05/28');
     } catch (error) {
@@ -142,7 +142,7 @@ describe('validateDate', () => {
     }
   });
 
-  it('shoudl throw error for invalid date 2', () => {
+  it('should throw error for invalid date 2', () => {
     try {
       validateDate('wrong');
     } catch (error) {
