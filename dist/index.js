@@ -7007,7 +7007,7 @@ const run = async () => {
       if (folder === '*' || modifiedFiles.some((filename) => filename.startsWith(folder))) {
         // Check if changelog is in the modified files
         if (!modifiedFiles.includes(`${folder === '*' ? '' : folder}CHANGELOG.md`)) {
-          throw new Error(`Files in "${folder}" have been modified but "${folder}CHANGELOG.md" was not modified`);
+          throw new Error(`Files in "${folder === '*' ? 'root' : folder}" have been modified but "${folder}CHANGELOG.md" was not modified`);
         }
       }
 
