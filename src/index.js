@@ -39,6 +39,8 @@ const run = async () => {
       const changelogContent = fs.readFileSync(`${folder}CHANGELOG.md`, { encoding: 'utf-8' });
       const { isUnreleased, version, date } = validateChangelog(changelogContent);
 
+      console.log(changelogContent);
+
       // Checks if the branch is release
       if (branch === 'release') {
         if (isUnreleased) {
