@@ -6652,20 +6652,21 @@ module.exports = parse;
 /***/ (function(module) {
 
 const changeTypes = [
-  'Added',
-  'Changed',
-  'Deprecated',
-  'Removed',
-  'Fixed',
-  'Security',
-  'Infrastructure', // Custom
-  'Updated', // Custom
+    'Added',
+    'Changed',
+    'Deprecated',
+    'Removed',
+    'Fixed',
+    'Security',
+    'Infrastructure', // Custom
+    'Updated', // Custom
 ];
 
 /**
  * Obtains the version and date of the given heading
  * Capture Group 1: Version | Unreleased
  * Capture Group 2: Date | Unreleased
+ * @see https://regex101.com/r/v5VmTx/2
  */
 const reH2 = /^##\s\[?(Unreleased)\]?|^##\s\[((?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-(?:(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?:[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)\] - (Unreleased|(?:\d\d?\d?\d?[-/.]\d\d?[-/.]\d\d?\d?\d))$/;
 
@@ -6677,9 +6678,9 @@ const reH2 = /^##\s\[?(Unreleased)\]?|^##\s\[((?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?
  * @returns {boolean}
  */
 const checkHeadingSpaces = (text, level) => {
-  const re = `^${'#'.repeat(level)}\\s([^\\s].*)$`;
-  const regex = new RegExp(re, 'g');
-  return regex.test(text);
+    const re = `^${'#'.repeat(level)}\\s([^\\s].*)$`;
+    const regex = new RegExp(re, 'g');
+    return regex.test(text);
 };
 
 /**
@@ -6687,15 +6688,15 @@ const checkHeadingSpaces = (text, level) => {
  * @param {string} text
  */
 const validateH1 = (text) => {
-  const titles = text.match(/^#[ ]{1,}.+$/gm) || [];
+    const titles = text.match(/^#[ ]{1,}.+$/gm) || [];
 
-  if (titles.length === 0) {
-    throw new Error('No title is present');
-  } else if (titles.length > 1) {
-    throw new Error('Only one title is allowed');
-  } else if (!checkHeadingSpaces(String(titles.slice(0, 1)), 1)) {
-    throw new Error('Title has more than one space');
-  }
+    if (titles.length === 0) {
+        throw new Error('No title is present');
+    } else if (titles.length > 1) {
+        throw new Error('Only one title is allowed');
+    } else if (!checkHeadingSpaces(String(titles.slice(0, 1)), 1)) {
+        throw new Error('Title has more than one space');
+    }
 };
 
 /**
@@ -6706,17 +6707,18 @@ const validateH1 = (text) => {
  * @returns {number}
  * @see https://github.com/substack/semver-compare
  */
+// eslint-disable-next-line consistent-return
 const compareSemVer = (a, b) => {
-  const pa = a.split('.');
-  const pb = b.split('.');
-  for (let i = 0; i < 3; i += 1) {
-    const na = Number(pa[i]);
-    const nb = Number(pb[i]);
-    if (na > nb) return 1;
-    if (nb > na) return -1;
-    if (!isNaN(na) && isNaN(nb)) return 1;
-    if (isNaN(na) && !isNaN(nb)) return -1;
-  }
+    const pa = a.split('.');
+    const pb = b.split('.');
+    for (let i = 0; i < 3; i += 1) {
+        const na = Number(pa[i]);
+        const nb = Number(pb[i]);
+        if (na > nb) return 1;
+        if (nb > na) return -1;
+        if (!isNaN(na) && isNaN(nb)) return 1;
+        if (isNaN(na) && !isNaN(nb)) return -1;
+    }
 };
 
 /**
@@ -6724,18 +6726,18 @@ const compareSemVer = (a, b) => {
  * @param {string} text
  */
 const validateH3 = (text) => {
-  const headings = text.match(/^###(\s*\w*)$/gm) || [];
+    const headings = text.match(/^###(\s*\w*)$/gm) || [];
 
-  headings.forEach((heading) => {
-    const re = `^###\\s(${changeTypes.join('|')})$`;
-    const regex = new RegExp(re, 'g');
+    headings.forEach((heading) => {
+        const re = `^###\\s(${changeTypes.join('|')})$`;
+        const regex = new RegExp(re, 'g');
 
-    if (!regex.test(heading)) {
-      throw new Error(`${heading} is not a valid change type`);
-    } else if (!checkHeadingSpaces(heading, 3)) {
-      throw new Error(`${heading} has incorrect spaces`);
-    }
-  });
+        if (!regex.test(heading)) {
+            throw new Error(`${heading} is not a valid change type`);
+        } else if (!checkHeadingSpaces(heading, 3)) {
+            throw new Error(`${heading} has incorrect spaces`);
+        }
+    });
 };
 
 /**
@@ -6743,17 +6745,17 @@ const validateH3 = (text) => {
  * @param {string} date
  */
 const validateDate = (date) => {
-  const [year, month, day] = date.replace(/\./g, '-').split('-');
+    const [year, month, day] = date.replace(/\./g, '-').split('-');
 
-  const newDate = (Number(year) < 1000)
-    ? Date.parse(`${day}-${month}-${year}`)
-    : Date.parse(`${year}-${month}-${day}`);
+    const newDate = (Number(year) < 1000)
+        ? Date.parse(`${day}-${month}-${year}`)
+        : Date.parse(`${year}-${month}-${day}`);
 
-  if (newDate) {
-    return newDate;
-  }
+    if (newDate) {
+        return newDate;
+    }
 
-  throw new Error(`Invalid date "${date}"`);
+    throw new Error(`Invalid date "${date}"`);
 };
 
 const isUnreleased = (unreleased, date) => Boolean(unreleased) || date === 'Unreleased';
@@ -6764,62 +6766,61 @@ const isUnreleased = (unreleased, date) => Boolean(unreleased) || date === 'Unre
  * @returns {object}
  */
 const validateH2 = (text) => {
-  const headings = text.match(/^##\s.*$/gm) || [];
+    const headings = text.match(/^##\s.*$/gm) || [];
 
-  if (headings.filter((heading) => heading.toLowerCase().includes('unreleased')).length > 1) {
-    throw new Error('Only one unreleased heading is allowed');
-  }
-
-  let previousVersion;
-  headings.forEach((heading) => {
-    /** @see https://regex101.com/r/v5VmTx/2 */
-    const [, unreleased, version, date] = heading.match(reH2) || [];
-
-    const currentVersion = version;
-
-    // Check if the date is valid
-    if (!isUnreleased(unreleased, date)) {
-      if (!date) {
-        throw new Error(`A date is required for version "${heading}"`);
-      }
+    if (headings.filter((heading) => heading.toLowerCase().includes('unreleased')).length > 1) {
+        throw new Error('Only one unreleased heading is allowed');
     }
 
-    if (previousVersion && currentVersion) {
-      const compare = compareSemVer(previousVersion, currentVersion);
+    let previousVersion;
+    headings.forEach((heading) => {
+        const [, unreleased, version, date] = heading.match(reH2) || [];
 
-      if (previousVersion === currentVersion) {
-        throw new Error(`Version ${previousVersion} can't be the same as a previous version`);
-      } else if (compare === -1) {
-        throw new Error(`Version ${previousVersion} can't be smaller than a previous version`);
-      }
-    }
+        const currentVersion = version;
 
-    if (currentVersion) {
-      previousVersion = currentVersion;
-    }
-  });
+        // Check if the date is valid
+        if (!isUnreleased(unreleased, date)) {
+            if (!date) {
+                throw new Error(`A date is required for version "${heading}"`);
+            }
+        }
 
-  // Return the newest heading information
-  const [, unreleased, version, date] = headings[0].match(reH2) || [];
-  return {
-    isUnreleased: isUnreleased(unreleased, date),
-    version,
-    date,
-  };
+        if (previousVersion && currentVersion) {
+            const compare = compareSemVer(previousVersion, currentVersion);
+
+            if (previousVersion === currentVersion) {
+                throw new Error(`Version ${previousVersion} can't be the same as a previous version`);
+            } else if (compare === -1) {
+                throw new Error(`Version ${previousVersion} can't be smaller than a previous version`);
+            }
+        }
+
+        if (currentVersion) {
+            previousVersion = currentVersion;
+        }
+    });
+
+    // Return the newest heading information
+    const [, unreleased, version, date] = headings[0].match(reH2) || [];
+    return {
+        isUnreleased: isUnreleased(unreleased, date),
+        version,
+        date,
+    };
 };
 
 const validateChangelog = (text) => {
-  validateH1(text);
-  const newestHeading = validateH2(text);
-  validateH3(text);
-  return newestHeading;
+    validateH1(text);
+    const newestHeading = validateH2(text);
+    validateH3(text);
+    return newestHeading;
 };
 
 module.exports = {
-  checkHeadingSpaces,
-  compareSemVer,
-  validateChangelog,
-  validateDate,
+    checkHeadingSpaces,
+    compareSemVer,
+    validateChangelog,
+    validateDate,
 };
 
 
@@ -6972,78 +6973,87 @@ module.exports = require("util");
 
 const fs = __webpack_require__(747);
 const core = __webpack_require__(470);
-const { context, getOctokit } = __webpack_require__(469);
+const util = __webpack_require__(669);
 
-const { validateChangelog } = __webpack_require__(601);
-const { getModifiedFiles } = __webpack_require__(688);
+const readFile = util.promisify(fs.readFile);
+
+const {
+    context, getOctokit,
+} = __webpack_require__(469);
+
+const {validateChangelog} = __webpack_require__(601);
+const {getModifiedFiles} = __webpack_require__(688);
 
 const run = async () => {
-  const token = core.getInput('token', { required: true });
-  const octokit = getOctokit(token);
-  const sources = core.getInput('sources', { required: true }).split(',');
-  const ignoreActionLabel = core.getInput('ignoreActionLabel');
+    const token = core.getInput('token', {required: true});
+    const octokit = getOctokit(token);
+    const sources = core.getInput('sources', {required: true});
+    const ignoreActionLabel = core.getInput('ignoreActionLabel');
 
-  const repo = context.payload.repository.name;
-  const owner = context.payload.repository.full_name.split('/')[0];
-  const pullNumber = context.payload.pull_request.number;
-  const labels = context.payload.pull_request.labels.map((label) => label.name);
-  const branch = context.payload.pull_request.head.ref;
-  const { sha } = context.payload.pull_request.head;
+    const repo = context.payload.repository.name;
+    const owner = context.payload.repository.full_name.split('/')[0];
+    const pullNumber = context.payload.pull_request.number;
+    const labels = context.payload.pull_request.labels.map((label) => label.name);
+    const branch = context.payload.pull_request.head.ref;
+    const {sha} = context.payload.pull_request.head;
 
-  try {
-    // Ignore the action if -Changelog label (or custom name) exists
-    if (labels.includes(ignoreActionLabel)) {
-      core.info(`Ignore the action due to label ${ignoreActionLabel}`);
-      process.exit(0);
+    try {
+    // Ignore the action if -changelog label (or custom name) exists
+        if (labels.includes(ignoreActionLabel)) {
+            core.info(`Ignore the action due to label ${ignoreActionLabel}`);
+            process.exit(0);
+        }
+
+        const modifiedFiles = await getModifiedFiles(octokit, repo, owner, pullNumber);
+        const hasSources = Boolean(sources);
+
+        (hasSources ? sources.split(',') : ['root']).forEach(async (folder) => {
+            // Check if at least one file was modified in the watchFolder
+            if (folder === 'root' || modifiedFiles.some((filename) => filename.startsWith(folder))) {
+                // Check if changelog is in the modified files
+                if (!modifiedFiles.includes(`${folder === 'root' ? '' : folder}CHANGELOG.md`)) {
+                    throw new Error(`Files in "${folder === 'root' ? 'root' : folder}" have been modified but "${folder === 'root' ? '' : folder}CHANGELOG.md" was not modified`);
+                }
+            }
+
+            const changelogContent = await readFile(`${folder}CHANGELOG.md`, {encoding: 'utf-8'});
+            const {
+                isUnreleased, version, date,
+            } = validateChangelog(changelogContent);
+
+            // Checks if the branch is release
+            if (branch === 'release') {
+                if (isUnreleased) {
+                    throw new Error('A release branch can\'t be unreleased');
+                }
+
+                if (!version || version === 'Unreleased') {
+                    throw new Error('A release branch should have a version');
+                }
+
+                if (!date) {
+                    throw new Error('A release branch should have a date');
+                }
+
+                const {version: packageVersion} = JSON.parse(await readFile(`${folder}package.json`, {encoding: 'utf-8'}));
+                const {version: packageLockVersion} = JSON.parse(await readFile(`${folder}package-lock.json`, {encoding: 'utf-8'}));
+
+                if (packageVersion !== version || packageLockVersion !== version) {
+                    throw new Error(`The package version "${packageVersion}" does not match the newest version "${version}"`);
+                }
+            }
+        });
+    } catch (error) {
+        octokit.repos.createCommitStatus({
+            owner,
+            repo,
+            sha,
+            state: 'error',
+            description: error.message,
+            context: 'Changelog',
+        });
+        core.setFailed(error.message);
     }
-
-    const modifiedFiles = await getModifiedFiles(octokit, repo, owner, pullNumber);
-
-    sources.forEach((folder) => {
-      // Check if at least one file was modified in the watchFolder
-      if (folder === '*' || modifiedFiles.some((filename) => filename.startsWith(folder))) {
-        // Check if changelog is in the modified files
-        if (!modifiedFiles.includes(`${folder === '*' ? '' : folder}CHANGELOG.md`)) {
-          throw new Error(`Files in "${folder === '*' ? 'root' : folder}" have been modified but "${folder === '*' ? '' : folder}CHANGELOG.md" was not modified`);
-        }
-      }
-
-      const changelogContent = fs.readFileSync(`${folder}CHANGELOG.md`, { encoding: 'utf-8' });
-      const { isUnreleased, version, date } = validateChangelog(changelogContent);
-
-      // Checks if the branch is release
-      if (branch === 'release') {
-        if (isUnreleased) {
-          throw new Error('A release branch can\'t be unreleased');
-        }
-
-        if (!version || version === 'Unreleased') {
-          throw new Error('A release branch should have a version');
-        }
-
-        if (!date) {
-          throw new Error('A release branch should have a date');
-        }
-
-        const { version: packageVersion } = JSON.parse(fs.readFileSync(`${folder}package.json`, { encoding: 'utf-8' }));
-        const { version: packageLockVersion } = JSON.parse(fs.readFileSync(`${folder}package-lock.json`, { encoding: 'utf-8' }));
-
-        if (packageVersion !== version || packageLockVersion !== version) {
-          throw new Error(`The package version "${packageVersion}" does not match the newest version "${version}"`);
-        }
-      }
-    });
-  } catch (error) {
-    octokit.repos.createCommitStatus({
-      owner,
-      repo,
-      sha,
-      state: 'error',
-      description: error.message,
-      context: 'Changelog',
-    });
-    core.setFailed(error.message);
-  }
 };
 
 run();
@@ -7062,18 +7072,18 @@ run();
  * @param {number} pullNumber
  */
 const getModifiedFiles = async (octokit, repo, owner, pullNumber) => {
-  const files = await octokit.pulls.listFiles({
-    owner,
-    repo,
-    pull_number: pullNumber,
-    per_page: 100, // Todo read all pagination
-  });
+    const files = await octokit.pulls.listFiles({
+        owner,
+        repo,
+        pull_number: pullNumber,
+        per_page: 100,
+    });
 
-  return files.data.map((file) => file.filename);
+    return files.data.map((file) => file.filename);
 };
 
 module.exports = {
-  getModifiedFiles,
+    getModifiedFiles,
 };
 
 
