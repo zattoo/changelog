@@ -6,7 +6,6 @@ inputs:
     required: true
   sources:
     description: 'Comma separated string with the folders to check'
-    default: '*'
   ignoreActionLabel:
     description: 'Label to avoid executing the action'
     required: false
