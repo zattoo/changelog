@@ -7007,7 +7007,11 @@ const run = async () => {
         const modifiedFiles = await getModifiedFiles(octokit, repo, owner, pullNumber);
         const hasSources = Boolean(sources);
 
+        console.log({sources});
+        console.log({hasSources});
+
         (hasSources ? sources.split(',') : ['root']).forEach(async (folder) => {
+            console.log({folder});
             // Check if at least one file was modified in the watchFolder
             if (folder === 'root' || modifiedFiles.some((filename) => filename.startsWith(folder))) {
                 // Check if changelog is in the modified files
