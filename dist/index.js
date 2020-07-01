@@ -6987,7 +6987,7 @@ const {getModifiedFiles} = __webpack_require__(688);
 const run = async () => {
     const token = core.getInput('token', {required: true});
     const octokit = getOctokit(token);
-    const sources = core.getInput('sources', {required: true});
+    const sources = core.getInput('sources', {required: false});
     const ignoreActionLabel = core.getInput('ignoreActionLabel');
 
     const repo = context.payload.repository.name;
