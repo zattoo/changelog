@@ -14,7 +14,7 @@ const {getModifiedFiles} = require('./files');
 const run = async () => {
     const token = core.getInput('token', {required: true});
     const octokit = getOctokit(token);
-    const sources = core.getInput('sources', {required: true}).split(',');
+    const sources = core.getInput('sources', {required: false});
     const ignoreActionLabel = core.getInput('ignoreActionLabel');
 
     const repo = context.payload.repository.name;
@@ -32,13 +32,14 @@ const run = async () => {
         }
 
         const modifiedFiles = await getModifiedFiles(octokit, repo, owner, pullNumber);
+        const hasSources = Boolean(sources);
 
-        sources.forEach(async (folder) => {
+        (hasSources ? sources.split(',') : ['root']).forEach(async (folder) => {
             // Check if at least one file was modified in the watchFolder
-            if (folder === '*' || modifiedFiles.some((filename) => filename.startsWith(folder))) {
+            if (folder === 'root' || modifiedFiles.some((filename) => filename.startsWith(folder))) {
                 // Check if changelog is in the modified files
-                if (!modifiedFiles.includes(`${folder === '*' ? '' : folder}CHANGELOG.md`)) {
-                    throw new Error(`Files in "${folder === '*' ? 'root' : folder}" have been modified but "${folder === '*' ? '' : folder}CHANGELOG.md" was not modified`);
+                if (!modifiedFiles.includes(`${folder === 'root' ? '' : folder}CHANGELOG.md`)) {
+                    throw new Error(`Files in "${folder === 'root' ? 'root' : folder}" have been modified but "${folder === 'root' ? '' : folder}CHANGELOG.md" was not modified`);
                 }
             }
 

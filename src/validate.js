@@ -13,6 +13,7 @@ const changeTypes = [
  * Obtains the version and date of the given heading
  * Capture Group 1: Version | Unreleased
  * Capture Group 2: Date | Unreleased
+ * @see https://regex101.com/r/v5VmTx/2
  */
 const reH2 = /^##\s\[?(Unreleased)\]?|^##\s\[((?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-(?:(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?:[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)\] - (Unreleased|(?:\d\d?\d?\d?[-/.]\d\d?[-/.]\d\d?\d?\d))$/;
 
@@ -120,7 +121,6 @@ const validateH2 = (text) => {
 
     let previousVersion;
     headings.forEach((heading) => {
-    /** @see https://regex101.com/r/v5VmTx/2 */
         const [, unreleased, version, date] = heading.match(reH2) || [];
 
         const currentVersion = version;
