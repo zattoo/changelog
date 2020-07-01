@@ -6,16 +6,16 @@
  * @param {number} pullNumber
  */
 const getModifiedFiles = async (octokit, repo, owner, pullNumber) => {
-  const files = await octokit.pulls.listFiles({
-    owner,
-    repo,
-    pull_number: pullNumber,
-    per_page: 100, // Todo read all pagination
-  });
+    const files = await octokit.pulls.listFiles({
+        owner,
+        repo,
+        pull_number: pullNumber,
+        per_page: 100,
+    });
 
-  return files.data.map((file) => file.filename);
+    return files.data.map((file) => file.filename);
 };
 
 module.exports = {
-  getModifiedFiles,
+    getModifiedFiles,
 };

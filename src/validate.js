@@ -1,12 +1,12 @@
 const changeTypes = [
-  'Added',
-  'Changed',
-  'Deprecated',
-  'Removed',
-  'Fixed',
-  'Security',
-  'Infrastructure', // Custom
-  'Updated', // Custom
+    'Added',
+    'Changed',
+    'Deprecated',
+    'Removed',
+    'Fixed',
+    'Security',
+    'Infrastructure', // Custom
+    'Updated', // Custom
 ];
 
 /**
@@ -24,9 +24,9 @@ const reH2 = /^##\s\[?(Unreleased)\]?|^##\s\[((?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?
  * @returns {boolean}
  */
 const checkHeadingSpaces = (text, level) => {
-  const re = `^${'#'.repeat(level)}\\s([^\\s].*)$`;
-  const regex = new RegExp(re, 'g');
-  return regex.test(text);
+    const re = `^${'#'.repeat(level)}\\s([^\\s].*)$`;
+    const regex = new RegExp(re, 'g');
+    return regex.test(text);
 };
 
 /**
@@ -34,15 +34,15 @@ const checkHeadingSpaces = (text, level) => {
  * @param {string} text
  */
 const validateH1 = (text) => {
-  const titles = text.match(/^#[ ]{1,}.+$/gm) || [];
+    const titles = text.match(/^#[ ]{1,}.+$/gm) || [];
 
-  if (titles.length === 0) {
-    throw new Error('No title is present');
-  } else if (titles.length > 1) {
-    throw new Error('Only one title is allowed');
-  } else if (!checkHeadingSpaces(String(titles.slice(0, 1)), 1)) {
-    throw new Error('Title has more than one space');
-  }
+    if (titles.length === 0) {
+        throw new Error('No title is present');
+    } else if (titles.length > 1) {
+        throw new Error('Only one title is allowed');
+    } else if (!checkHeadingSpaces(String(titles.slice(0, 1)), 1)) {
+        throw new Error('Title has more than one space');
+    }
 };
 
 /**
@@ -53,17 +53,18 @@ const validateH1 = (text) => {
  * @returns {number}
  * @see https://github.com/substack/semver-compare
  */
+// eslint-disable-next-line consistent-return
 const compareSemVer = (a, b) => {
-  const pa = a.split('.');
-  const pb = b.split('.');
-  for (let i = 0; i < 3; i += 1) {
-    const na = Number(pa[i]);
-    const nb = Number(pb[i]);
-    if (na > nb) return 1;
-    if (nb > na) return -1;
-    if (!isNaN(na) && isNaN(nb)) return 1;
-    if (isNaN(na) && !isNaN(nb)) return -1;
-  }
+    const pa = a.split('.');
+    const pb = b.split('.');
+    for (let i = 0; i < 3; i += 1) {
+        const na = Number(pa[i]);
+        const nb = Number(pb[i]);
+        if (na > nb) return 1;
+        if (nb > na) return -1;
+        if (!isNaN(na) && isNaN(nb)) return 1;
+        if (isNaN(na) && !isNaN(nb)) return -1;
+    }
 };
 
 /**
@@ -71,18 +72,18 @@ const compareSemVer = (a, b) => {
  * @param {string} text
  */
 const validateH3 = (text) => {
-  const headings = text.match(/^###(\s*\w*)$/gm) || [];
+    const headings = text.match(/^###(\s*\w*)$/gm) || [];
 
-  headings.forEach((heading) => {
-    const re = `^###\\s(${changeTypes.join('|')})$`;
-    const regex = new RegExp(re, 'g');
+    headings.forEach((heading) => {
+        const re = `^###\\s(${changeTypes.join('|')})$`;
+        const regex = new RegExp(re, 'g');
 
-    if (!regex.test(heading)) {
-      throw new Error(`${heading} is not a valid change type`);
-    } else if (!checkHeadingSpaces(heading, 3)) {
-      throw new Error(`${heading} has incorrect spaces`);
-    }
-  });
+        if (!regex.test(heading)) {
+            throw new Error(`${heading} is not a valid change type`);
+        } else if (!checkHeadingSpaces(heading, 3)) {
+            throw new Error(`${heading} has incorrect spaces`);
+        }
+    });
 };
 
 /**
@@ -90,17 +91,17 @@ const validateH3 = (text) => {
  * @param {string} date
  */
 const validateDate = (date) => {
-  const [year, month, day] = date.replace(/\./g, '-').split('-');
+    const [year, month, day] = date.replace(/\./g, '-').split('-');
 
-  const newDate = (Number(year) < 1000)
-    ? Date.parse(`${day}-${month}-${year}`)
-    : Date.parse(`${year}-${month}-${day}`);
+    const newDate = (Number(year) < 1000)
+        ? Date.parse(`${day}-${month}-${year}`)
+        : Date.parse(`${year}-${month}-${day}`);
 
-  if (newDate) {
-    return newDate;
-  }
+    if (newDate) {
+        return newDate;
+    }
 
-  throw new Error(`Invalid date "${date}"`);
+    throw new Error(`Invalid date "${date}"`);
 };
 
 const isUnreleased = (unreleased, date) => Boolean(unreleased) || date === 'Unreleased';
@@ -111,60 +112,60 @@ const isUnreleased = (unreleased, date) => Boolean(unreleased) || date === 'Unre
  * @returns {object}
  */
 const validateH2 = (text) => {
-  const headings = text.match(/^##\s.*$/gm) || [];
+    const headings = text.match(/^##\s.*$/gm) || [];
 
-  if (headings.filter((heading) => heading.toLowerCase().includes('unreleased')).length > 1) {
-    throw new Error('Only one unreleased heading is allowed');
-  }
+    if (headings.filter((heading) => heading.toLowerCase().includes('unreleased')).length > 1) {
+        throw new Error('Only one unreleased heading is allowed');
+    }
 
-  let previousVersion;
-  headings.forEach((heading) => {
+    let previousVersion;
+    headings.forEach((heading) => {
     /** @see https://regex101.com/r/v5VmTx/2 */
-    const [, unreleased, version, date] = heading.match(reH2) || [];
+        const [, unreleased, version, date] = heading.match(reH2) || [];
 
-    const currentVersion = version;
+        const currentVersion = version;
 
-    // Check if the date is valid
-    if (!isUnreleased(unreleased, date)) {
-      if (!date) {
-        throw new Error(`A date is required for version "${heading}"`);
-      }
-    }
+        // Check if the date is valid
+        if (!isUnreleased(unreleased, date)) {
+            if (!date) {
+                throw new Error(`A date is required for version "${heading}"`);
+            }
+        }
 
-    if (previousVersion && currentVersion) {
-      const compare = compareSemVer(previousVersion, currentVersion);
+        if (previousVersion && currentVersion) {
+            const compare = compareSemVer(previousVersion, currentVersion);
 
-      if (previousVersion === currentVersion) {
-        throw new Error(`Version ${previousVersion} can't be the same as a previous version`);
-      } else if (compare === -1) {
-        throw new Error(`Version ${previousVersion} can't be smaller than a previous version`);
-      }
-    }
+            if (previousVersion === currentVersion) {
+                throw new Error(`Version ${previousVersion} can't be the same as a previous version`);
+            } else if (compare === -1) {
+                throw new Error(`Version ${previousVersion} can't be smaller than a previous version`);
+            }
+        }
 
-    if (currentVersion) {
-      previousVersion = currentVersion;
-    }
-  });
+        if (currentVersion) {
+            previousVersion = currentVersion;
+        }
+    });
 
-  // Return the newest heading information
-  const [, unreleased, version, date] = headings[0].match(reH2) || [];
-  return {
-    isUnreleased: isUnreleased(unreleased, date),
-    version,
-    date,
-  };
+    // Return the newest heading information
+    const [, unreleased, version, date] = headings[0].match(reH2) || [];
+    return {
+        isUnreleased: isUnreleased(unreleased, date),
+        version,
+        date,
+    };
 };
 
 const validateChangelog = (text) => {
-  validateH1(text);
-  const newestHeading = validateH2(text);
-  validateH3(text);
-  return newestHeading;
+    validateH1(text);
+    const newestHeading = validateH2(text);
+    validateH3(text);
+    return newestHeading;
 };
 
 module.exports = {
-  checkHeadingSpaces,
-  compareSemVer,
-  validateChangelog,
-  validateDate,
+    checkHeadingSpaces,
+    compareSemVer,
+    validateChangelog,
+    validateDate,
 };
