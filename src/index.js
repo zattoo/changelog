@@ -14,7 +14,7 @@ const {getModifiedFiles} = require('./files');
 const run = async () => {
     const token = core.getInput('token', {required: true});
     const octokit = getOctokit(token);
-    const sources = core.getInput('sources');
+    const sources = core.getInput('sources', {required: false});
     const ignoreActionLabel = core.getInput('ignoreActionLabel');
 
     const repo = context.payload.repository.name;
