@@ -25,7 +25,7 @@ GitHub Action to validate CHANGELOG.md files and indicate if the changelog shoul
     - Version should match package.json and package-lock.json
     - Can't be "Unreleased"
 
-To avoid doing checks a label with the message `-Changelog` should be in the pull request.
+To avoid doing checks a label with the message `-changelog` should be in the pull request.
 
 ## Inputs
 
@@ -44,7 +44,7 @@ Example : 'src/example'
 
 ### `ignoreActionLabel`
 
-`string`,  default: `-Changelog`
+`string`,  default: `-changelog`
 
 Pull request label name to avoid executing the action
 

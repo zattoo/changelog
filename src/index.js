@@ -19,7 +19,7 @@ const run = async () => {
   const { sha } = context.payload.pull_request.head;
 
   try {
-    // Ignore the action if -Changelog label (or custom name) exists
+    // Ignore the action if -changelog label (or custom name) exists
     if (labels.includes(ignoreActionLabel)) {
       core.info(`Ignore the action due to label ${ignoreActionLabel}`);
       process.exit(0);

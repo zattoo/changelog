@@ -10,7 +10,7 @@ inputs:
   ignoreActionLabel:
     description: 'Label to avoid executing the action'
     required: false
-    default: '-Changelog'
+    default: '-changelog'
 runs:
   using: 'node12'
   main: 'dist/index.js'

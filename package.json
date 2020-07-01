@@ -1,7 +1,7 @@
 {
   "name": "changelog",
   "version": "1.0.0",
-  "description": "",
+  "description": "Detects changes and validates a given changelog",
   "main": "src/index.js",
   "scripts": {
     "test": "jest",
@@ -18,7 +18,7 @@
     "JavaScript",
     "Validate"
   ],
-  "author": "",
+  "author": "dobladov",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/zattoo/changelog/issues"
@@ -29,7 +29,8 @@
     "@actions/github": "4.0.0"
   },
   "devDependencies": {
-    "@zeit/ncc": "^0.22.3",
+    "@zattoo/eslint-config": "^9.0.0",
+    "@zeit/ncc": "0.22.3",
     "eslint": "7.3.1",
     "eslint-config-airbnb-base": "14.2.0",
     "eslint-plugin-import": "2.22.0",
