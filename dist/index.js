@@ -7002,7 +7002,8 @@ const run = async () => {
     // Ignore the action if -changelog label (or custom name) exists
         if (labels.includes(ignoreActionLabel)) {
             core.info(`Ignore the action due to label ${ignoreActionLabel}`);
-            process.exit(0);
+            throw new Error('This is a test');
+            // process.exit(0);
         }
 
         const modifiedFiles = await getModifiedFiles(octokit, repo, owner, pullNumber);
