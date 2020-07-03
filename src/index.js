@@ -3,6 +3,7 @@ const core = require('@actions/core');
 const util = require('util');
 
 const readFile = util.promisify(fs.readFile);
+const stat = util.promisify(fs.stat);
 
 const {
     context, getOctokit,
@@ -34,12 +35,14 @@ const run = async () => {
         const modifiedFiles = await getModifiedFiles(octokit, repo, owner, pullNumber);
         const hasSources = Boolean(sources);
 
-        (hasSources ? sources.split(',') : ['root']).forEach(async (folder) => {
+        (hasSources ? sources.split(',') : ['']).forEach(async (folder) => {
+            const isRoot = folder === '';
+
             // Check if at least one file was modified in the watchFolder
-            if (folder === 'root' || modifiedFiles.some((filename) => filename.startsWith(folder))) {
+            if (isRoot || modifiedFiles.some((filename) => filename.startsWith(folder))) {
                 // Check if changelog is in the modified files
-                if (!modifiedFiles.includes(`${folder === 'root' ? '' : folder}CHANGELOG.md`)) {
-                    throw new Error(`Files in "${folder === 'root' ? 'root' : folder}" have been modified but "${folder === 'root' ? '' : folder}CHANGELOG.md" was not modified`);
+                if (!modifiedFiles.includes(`${folder}CHANGELOG.md`)) {
+                    throw new Error(`Files in "${isRoot ? 'root' : folder}" have been modified but "${folder}CHANGELOG.md" was not modified`);
                 }
             }
 
@@ -63,10 +66,17 @@ const run = async () => {
                 }
 
                 const {version: packageVersion} = JSON.parse(await readFile(`${folder}package.json`, {encoding: 'utf-8'}));
-                const {version: packageLockVersion} = JSON.parse(await readFile(`${folder}package-lock.json`, {encoding: 'utf-8'}));
-
-                if (packageVersion !== version || packageLockVersion !== version) {
+                if (packageVersion !== version) {
                     throw new Error(`The package version "${packageVersion}" does not match the newest version "${version}"`);
+                }
+
+                const packageLockStats = await stat(`${folder}package-lock.json`);
+
+                if (packageLockStats) {
+                    const {version: packageLockVersion} = JSON.parse(await readFile(`${folder}package-lock.json`, {encoding: 'utf-8'}));
+                    if (packageLockVersion !== version) {
+                        throw new Error(`The package-lock version "${packageVersion}" does not match the newest version "${version}"`);
+                    }
                 }
             }
         });
