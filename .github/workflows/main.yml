@@ -11,6 +11,5 @@ jobs:
         uses: ./ # Uses an action in the root directory
         with:
           token: ${{ github.token }}
-          sources: 'projects/app/, projects/embed/, projects/account/'
 
 

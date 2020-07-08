@@ -35,8 +35,6 @@ const run = async () => {
         const modifiedFiles = await getModifiedFiles(octokit, repo, owner, pullNumber);
         const folders = Boolean(sources) ? sources.split(/, */g) : ['']
 
-        console.log({ folders })
-
         for await (const path of folders) {
             const folder = path.endsWith('/') ? path : `${path}/`;
             const isRoot = folder === '';

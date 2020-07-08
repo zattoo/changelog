@@ -39,8 +39,8 @@ Required. GitHub token
 
 `array of strings`
 
-Optional. Array containing the paths to watch containing a package.json
-Example : ['src/projects/a', 'src/projects/b']
+Optional. String with folders to watch separated by commas
+Example : 'projects/app/, projects/embed/, projects/account/'
 
 ### `ignoreActionLabel`
 

@@ -5,7 +5,7 @@ inputs:
     description: 'GitHub token'
     required: true
   sources:
-    description: 'Array of strings with the folders to watch'
+    description: 'String with folders to watch separated by commas'
     required: false
   ignoreActionLabel:
     description: 'Label to avoid executing the action'
