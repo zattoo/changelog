@@ -7009,7 +7009,7 @@ const run = async () => {
         const folders = Boolean(sources) ? sources.split(/, */g) : ['']
 
         for await (const path of folders) {
-            const folder = path.endsWith('/') ? path : `${path}/`;
+            const folder = (Boolean(path) && path.endsWith('/')) ? path : `${path}/`;
             const isRoot = folder === '';
 
             // Check if at least one file was modified in the watchFolder
