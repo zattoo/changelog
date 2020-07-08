@@ -7010,7 +7010,7 @@ const run = async () => {
 
         for await (const path of folders) {
             const isRoot = path === '';
-            const folder = (!isRoot && path.endsWith('/')) ? path : `${path}/`;
+            const folder = (!path.endsWith('/') && !isRoot) ? `${path}/` : path;
 
             // Check if at least one file was modified in the watchFolder
             if (isRoot || modifiedFiles.some((filename) => filename.startsWith(folder))) {
