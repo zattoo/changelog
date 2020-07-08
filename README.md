@@ -37,10 +37,10 @@ Required. GitHub token
 
 ### `sources`
 
-`string`
+`array of strings`
 
-Optional. Comma separated string with all the directories to watch
-Example : 'src/example'
+Optional. Array containing the paths to watch containing a package.json
+Example : ['src/projects/a', 'src/projects/b']
 
 ### `ignoreActionLabel`
 
@@ -64,4 +64,4 @@ jobs:
         uses: zattoo/changelog
         with:
           token: ${{ github.token }}
-          sources: 'src/example'
+          sources: ['src/projects/a', 'src/projects/b']

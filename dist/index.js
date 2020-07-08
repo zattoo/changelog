@@ -7006,9 +7006,12 @@ const run = async () => {
         }
 
         const modifiedFiles = await getModifiedFiles(octokit, repo, owner, pullNumber);
-        const folders = Boolean(sources) ? sources.split(',') : ['']
+        const folders = Boolean(sources) ? JSON.parse(sources) : ['']
 
-        for await (const folder of folders) {
+        console.log({ folders })
+
+        for await (const path of folders) {
+            const folder = path.endsWith('/') ? path : `${path}/`;
             const isRoot = folder === '';
 
             // Check if at least one file was modified in the watchFolder
