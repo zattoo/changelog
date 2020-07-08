@@ -6991,6 +6991,8 @@ const run = async () => {
     const sources = core.getInput('sources', {required: false});
     const ignoreActionLabel = core.getInput('ignoreActionLabel');
 
+    console.log({sources})
+
     const repo = context.payload.repository.name;
     const owner = context.payload.repository.full_name.split('/')[0];
     const pullNumber = context.payload.pull_request.number;
