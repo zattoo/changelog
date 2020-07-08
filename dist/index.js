@@ -7006,7 +7006,7 @@ const run = async () => {
         }
 
         const modifiedFiles = await getModifiedFiles(octokit, repo, owner, pullNumber);
-        const folders = Boolean(sources) ? JSON.parse(sources) : ['']
+        const folders = Boolean(sources) ? sources.split(/, */g) : ['']
 
         console.log({ folders })
 
