@@ -5,7 +5,7 @@ inputs:
     description: 'GitHub token'
     required: true
   sources:
-    description: 'Comma separated string with the folders to check'
+    description: 'String with folders to watch separated by commas'
     required: false
   ignoreActionLabel:
     description: 'Label to avoid executing the action'
