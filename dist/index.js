@@ -6999,16 +6999,16 @@ const run = async () => {
     const {sha} = context.payload.pull_request.head;
 
     try {
-    // Ignore the action if -changelog label (or custom name) exists
+        // Ignore the action if -changelog label (or custom name) exists
         if (labels.includes(ignoreActionLabel)) {
             core.info(`Ignore the action due to label ${ignoreActionLabel}`);
             process.exit(0);
         }
 
         const modifiedFiles = await getModifiedFiles(octokit, repo, owner, pullNumber);
-        const hasSources = Boolean(sources);
+        const folders = Boolean(sources) ? sources.split(',') : ['']
 
-        (hasSources ? sources.split(',') : ['']).forEach(async (folder) => {
+        for await (const folder of folders) {
             const isRoot = folder === '';
 
             // Check if at least one file was modified in the watchFolder
@@ -7052,7 +7052,7 @@ const run = async () => {
                     }
                 }
             }
-        });
+        }
     } catch (error) {
         octokit.repos.createCommitStatus({
             owner,
