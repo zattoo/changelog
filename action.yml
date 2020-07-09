@@ -1,4 +1,4 @@
-name: 'Changelog'
+name: 'Changelog Validate'
 description: 'Detects changes and validates a given changelog'
 inputs:
   token:
@@ -15,5 +15,5 @@ runs:
   using: 'node12'
   main: 'dist/index.js'
 branding:
-  icon: check-square
+  icon: file-text
   color: green
