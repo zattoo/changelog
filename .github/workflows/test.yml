@@ -1,3 +1,4 @@
+name: Test
 on: [pull_request]
 
 jobs:
@@ -17,5 +18,4 @@ jobs:
       - uses: ./ # Uses an action in the root directory
         with:
           token: ${{github.token}}
-
 
