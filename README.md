@@ -1,4 +1,4 @@
-# 📋 Changelog
+# 📋 Changelog Validate
 GitHub Action to validate CHANGELOG.md files and indicate if the changelog should be modified based on watch folders.
 
 ## Validations:
@@ -54,14 +54,12 @@ Pull request label name to avoid executing the action
 on: [pull_request]
 
 jobs:
-  validate_changelog:
+  changelog:
     runs-on: ubuntu-latest
-    name: Validate Changelog
+    name: Changelog Validate
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Use changelog action
-        uses: zattoo/changelog
+      - uses: actions/checkout@v2
+      - uses: zattoo/changelog@v1
         with:
-          token: ${{ github.token }}
-          sources: ['src/projects/a', 'src/projects/b']
+          token: ${{github.token}}
+          sources: 'src/projects/a/, src/projects/b/'
