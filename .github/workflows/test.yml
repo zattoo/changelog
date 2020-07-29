@@ -12,6 +12,7 @@ jobs:
 
   changelog:
     name: Changelog
+    if: contains(github.head_ref, 'dependabot') != true
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
