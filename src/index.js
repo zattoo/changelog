@@ -12,7 +12,7 @@ const {
 const {validateChangelog} = require('./validate');
 const {
     getModifiedFiles,
-    getFolders
+    getFolders,
 } = require('./files');
 
 const run = async () => {

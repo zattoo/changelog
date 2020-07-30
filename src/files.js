@@ -1,6 +1,6 @@
 const {
     hasMagic,
-    promise: glob
+    promise: glob,
 } = require('glob-promise');
 
 /**
@@ -11,19 +11,21 @@ const {
 const getFolders = async (sources) => {
     /** Use root directory if sources is not defined */
     if (!sources) {
-        return ['']
+        return [''];
     }
 
-    const folders = []
+    const folders = [];
 
     for await (const source of sources.split(/, */g)) {
-        hasMagic(source)
-            ? folders.push(...await glob(source))
-            : folders.push(source)
+        if (hasMagic(source)) {
+            folders.push(...await glob(source));
+        } else {
+            folders.push(source);
+        }
     }
 
-    return folders
-}
+    return folders;
+};
 
 /**
  * Returns the modified files in the PR
@@ -45,5 +47,5 @@ const getModifiedFiles = async (octokit, repo, owner, pullNumber) => {
 
 module.exports = {
     getFolders,
-    getModifiedFiles
+    getModifiedFiles,
 };
