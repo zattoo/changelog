@@ -1,3 +1,30 @@
+const {
+    hasMagic,
+    promise: glob
+} = require('glob-promise');
+
+/**
+ * List all folders specified in sources
+ * @param {string} [sources]
+ * @returns {Promise<string[]>}
+ */
+const getFolders = async (sources) => {
+    /** Use root directory if sources is not defined */
+    if (!sources) {
+        return ['']
+    }
+
+    const folders = []
+
+    for await (const source of sources.split(/, */g)) {
+        hasMagic(source)
+            ? folders.push(...await glob(source))
+            : folders.push(source)
+    }
+
+    return folders
+}
+
 /**
  * Returns the modified files in the PR
  * @param {function} octokit
@@ -17,5 +44,6 @@ const getModifiedFiles = async (octokit, repo, owner, pullNumber) => {
 };
 
 module.exports = {
-    getModifiedFiles,
+    getFolders,
+    getModifiedFiles
 };

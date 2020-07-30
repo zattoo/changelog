@@ -28,7 +28,8 @@
   "homepage": "https://github.com/zattoo/changelog#readme",
   "dependencies": {
     "@actions/core": "1.2.4",
-    "@actions/github": "4.0.0"
+    "@actions/github": "4.0.0",
+    "glob-promise": "^3.4.0"
   },
   "devDependencies": {
     "@zattoo/eslint-config": "^9.0.0",
