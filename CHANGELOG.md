@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 
+## [1.1.0] - 30.07.2020
+
+Support glob in sources
+
 ## [1.0.2] - 09.07.2020
 
 Rename to Changelog Validate
