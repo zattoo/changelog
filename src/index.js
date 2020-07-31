@@ -10,7 +10,10 @@ const {
 } = require('@actions/github');
 
 const {validateChangelog} = require('./validate');
-const {getModifiedFiles} = require('./files');
+const {
+    getModifiedFiles,
+    getFolders,
+} = require('./files');
 
 const run = async () => {
     const token = core.getInput('token', {required: true});
@@ -33,7 +36,7 @@ const run = async () => {
         }
 
         const modifiedFiles = await getModifiedFiles(octokit, repo, owner, pullNumber);
-        const folders = sources ? sources.split(/, */g) : [''];
+        const folders = await getFolders(sources);
 
         for await (const path of folders) {
             const isRoot = path === '';
