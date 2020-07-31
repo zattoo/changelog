@@ -4442,33 +4442,6 @@ function range(a, b, str) {
 
 /***/ }),
 
-/***/ 294:
-/***/ (function(module, __unusedexports, __webpack_require__) {
-
-"use strict";
-
-
-const glob = __webpack_require__(402)
-
-const promise = function (pattern, options) {
-  return new Promise((resolve, reject) => {
-    glob(pattern, options, (err, files) => err === null ? resolve(files) : reject(err))
-  })
-}
-
-// default
-module.exports = promise
-
-// utility exports
-module.exports.glob = glob
-module.exports.Glob = glob.Glob
-module.exports.hasMagic = glob.hasMagic
-module.exports.promise = promise
-module.exports.sync = glob.sync
-
-
-/***/ }),
-
 /***/ 299:
 /***/ (function(__unusedmodule, exports) {
 
@@ -10106,10 +10079,10 @@ module.exports.win32 = win32;
 /***/ 688:
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
-const {
-    hasMagic,
-    promise: glob,
-} = __webpack_require__(294);
+const util = __webpack_require__(669);
+const glob = __webpack_require__(402);
+
+const globPromise = util.promisify(glob);
 
 /**
  * List all folders specified in sources
@@ -10125,8 +10098,8 @@ const getFolders = async (sources) => {
     const folders = [];
 
     for await (const source of sources.split(/, */g)) {
-        if (hasMagic(source)) {
-            folders.push(...await glob(source));
+        if (glob.hasMagic(source)) {
+            folders.push(...await globPromise(source));
         } else {
             folders.push(source);
         }

@@ -1,7 +1,7 @@
-const {
-    hasMagic,
-    promise: glob,
-} = require('glob-promise');
+const util = require('util');
+const glob = require('glob');
+
+const globPromise = util.promisify(glob);
 
 /**
  * List all folders specified in sources
@@ -17,8 +17,8 @@ const getFolders = async (sources) => {
     const folders = [];
 
     for await (const source of sources.split(/, */g)) {
-        if (hasMagic(source)) {
-            folders.push(...await glob(source));
+        if (glob.hasMagic(source)) {
+            folders.push(...await globPromise(source));
         } else {
             folders.push(source);
         }
