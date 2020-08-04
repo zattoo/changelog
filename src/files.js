@@ -18,7 +18,7 @@ const getFolders = async (sources) => {
 
     for await (const source of sources.split(/, */g)) {
         if (glob.hasMagic(source)) {
-            folders.push(...await globPromise(source));
+            folders.push(...await globPromise(source.endsWith('/') ? source : `${source}/`));
         } else {
             folders.push(source);
         }
