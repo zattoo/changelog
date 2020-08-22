@@ -62,13 +62,6 @@ describe('validateChangelog', () => {
         } catch {}
     });
 
-    it('should throw error for older version before newer version', async () => {
-        const olderVersionBefore = await readFile('./src/__test__/changelogs/olderVersionBefore.md', {encoding: 'utf-8'});
-        try {
-            expect(validateChangelog(olderVersionBefore)).toEqual('The previous release "19/05/2020" can\'t be older than "20/05/2020"');
-        } catch {}
-    });
-
     it('should throw error for same version repeated', async () => {
         const sameVersionRepeated = await readFile('./src/__test__/changelogs/sameVersionRepeated.md', {encoding: 'utf-8'});
         try {
