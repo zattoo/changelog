@@ -1,4 +1,4 @@
-# Changelog
+#  Changelog
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 
@@ -7,7 +7,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 ### Added
 - New functionality
 
-### Changed
+###  Changed
 - Update libs
 - Pass new value to function
 

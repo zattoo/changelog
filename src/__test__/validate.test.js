@@ -22,58 +22,47 @@ describe('validateChangelog', () => {
     });
 
     it('should throw error for not title present', () => {
-        try {
-            expect(validateChangelog('')).toTrhow('No title is present');
-        } catch {}
+        expect(() => validateChangelog('')).toThrow('No title is present');
     });
 
     it('should throw error for more than one title', async () => {
         const multipleH1 = await readFile('./src/__test__/changelogs/twoTitles.md', {encoding: 'utf-8'});
-        try {
-            expect(validateChangelog(multipleH1)).toThrow('Only one title is allowed');
-        } catch {}
+        expect(() => validateChangelog(multipleH1)).toThrow('Only one title is allowed');
     });
 
     it('should throw error for incorrect spaces', async () => {
         const incorrectSpaces = await readFile('./src/__test__/changelogs/incorrectSpaces.md', {encoding: 'utf-8'});
-        try {
-            expect(validateChangelog(incorrectSpaces)).toThrow('Title has more than one space');
-        } catch {}
+        expect(() => validateChangelog(incorrectSpaces)).toThrow('Title has incorrect spaces');
     });
 
     it('should throw error for wrong h3 type', async () => {
         const invalidH3Type = await readFile('./src/__test__/changelogs/invalidH3Type.md', {encoding: 'utf-8'});
-        try {
-            expect(validateChangelog(invalidH3Type)).toThrow('### Wrong is not a valid change type');
-        } catch {}
+        expect(() => validateChangelog(invalidH3Type)).toThrow('Is not a valid type of (Added|Changed|Deprecated|Removed|Fixed|Security|Infrastructure|Updated)');
     });
 
     it('should throw error for multiple "Unreleased" heading', async () => {
         const multipleUnreleased = await readFile('./src/__test__/changelogs/multipleUnreleased.md', {encoding: 'utf-8'});
-        try {
-            expect(validateChangelog(multipleUnreleased)).toThrow('Only one unreleased heading is allowed');
-        } catch {}
+        expect(() => validateChangelog(multipleUnreleased)).toThrow('Only one unreleased version is permitted');
     });
 
     it('should throw error for version without date', async () => {
         const releaseWithoutDate = await readFile('./src/__test__/changelogs/releaseWithoutDate.md', {encoding: 'utf-8'});
-        try {
-            expect(validateChangelog(releaseWithoutDate)).toThrow('A date is required for version "## [0.0.2]"');
-        } catch {}
+        expect(() => validateChangelog(releaseWithoutDate)).toThrow('A valid date is required for a version');
     });
 
     it('should throw error for same version repeated', async () => {
         const sameVersionRepeated = await readFile('./src/__test__/changelogs/sameVersionRepeated.md', {encoding: 'utf-8'});
-        try {
-            expect(validateChangelog(sameVersionRepeated)).toThrow('Version 0.0.1 can\'t be the same as a previous version');
-        } catch {}
+        expect(() => validateChangelog(sameVersionRepeated)).toThrow('Version repeated on lines');
     });
 
     it('should throw error if the next version is greater than the previous', async () => {
         const nextVersionGreaterThanPrevious = await readFile('./src/__test__/changelogs/nextVersionGreaterThanPrevious.md', {encoding: 'utf-8'});
-        try {
-            expect(validateChangelog(nextVersionGreaterThanPrevious)).toEqual('Version 0.0.1 can\'t be smaller than a previous version');
-        } catch {}
+        expect(() => validateChangelog(nextVersionGreaterThanPrevious)).toThrow('Previous version can\'t be smaller than the next one');
+    });
+
+    it('should throw error if for duplicated headings under the same version', async () => {
+        const nextVersionGreaterThanPrevious = await readFile('./src/__test__/changelogs/duplicatedHeadings.md', {encoding: 'utf-8'});
+        expect(() => validateChangelog(nextVersionGreaterThanPrevious)).toThrow('Version "0.0.2" can\'t have repeated headings');
     });
 });
 
@@ -107,14 +96,10 @@ describe('validateDate', () => {
     });
 
     it('should throw error for invalid date', () => {
-        try {
-            expect(validateDate('2020/05/28')).thThrow('Invalid date "2020/05/28"');
-        } catch {}
+        expect(validateDate('2020/05/28')).toBe(false);
     });
 
     it('should throw error for invalid date 2', () => {
-        try {
-            expect(validateDate('wrong')).toThrow('Invalid date "wrong"');
-        } catch {}
+        expect(validateDate('wrong')).toBe(false);
     });
 });
