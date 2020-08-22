@@ -7,7 +7,8 @@ GitHub Action to validate CHANGELOG.md files and indicate if the changelog shoul
   - Only one h2 with unreleased is allowed
   - H2 should contain a valid version or be unreleased
   - H2 heading should have a proper SemVer
-  - H2 Should have valid dates
+  - H2 should have valid dates
+  - No repeated H3 under the same H2
   - Versions should be in decremental order from top to bottom
   - It cannot contain two equal versions
   - Headings should have a correct number of spaces
