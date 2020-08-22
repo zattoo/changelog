@@ -26,7 +26,6 @@ const run = async () => {
     const pullNumber = context.payload.pull_request.number;
     const labels = context.payload.pull_request.labels.map((label) => label.name);
     const branch = context.payload.pull_request.head.ref;
-    const {sha} = context.payload.pull_request.head;
 
     try {
         // Ignore the action if -changelog label (or custom name) exists
@@ -85,14 +84,6 @@ const run = async () => {
             }
         }
     } catch (error) {
-        octokit.repos.createCommitStatus({
-            owner,
-            repo,
-            sha,
-            state: 'error',
-            description: error.message,
-            context: 'Changelog',
-        });
         core.setFailed(error.message);
     }
 };
