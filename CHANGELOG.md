@@ -3,6 +3,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 
+## [1.2.0] - 23.08.2020
+
+### Added
+- Check if a version has repeated headings.
+
+### Removed
+- Commit status
+
+### Infrastructure
+- Update packages
+
 ## [1.1.0] - 30.07.2020
 
 Support glob in sources
