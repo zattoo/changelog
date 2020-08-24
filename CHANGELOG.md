@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 ## [1.2.0] - 23.08.2020
 
 ### Added
-- Check if a version has repeated headings.
+- Check if a version has repeated headings
 
 ### Removed
 - Commit status
