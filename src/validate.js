@@ -18,7 +18,7 @@ const changeTypes = [
 const reH2 = /^##\s\[?(Unreleased)\]?|^##\s\[((?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-(?:(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?:[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)\] - (Unreleased|(?:\d\d?\d?\d?[-/.]\d\d?[-/.]\d\d?\d?\d))$/;
 
 /**
- * Validades if the given text heading
+ * Validates if the given text heading
  * has invalid spaces
  * @param {string} text
  * @param {number} level
@@ -28,22 +28,6 @@ const checkHeadingSpaces = (text, level) => {
     const re = `^${'#'.repeat(level)}\\s([^\\s].*)$`;
     const regex = new RegExp(re, 'g');
     return regex.test(text);
-};
-
-/**
- * Check if there is only an unique title
- * @param {string} text
- */
-const validateH1 = (text) => {
-    const titles = text.match(/^#[ ]{1,}.+$/gm) || [];
-
-    if (titles.length === 0) {
-        throw new Error('No title is present');
-    } else if (titles.length > 1) {
-        throw new Error('Only one title is allowed');
-    } else if (!checkHeadingSpaces(String(titles.slice(0, 1)), 1)) {
-        throw new Error('Title has more than one space');
-    }
 };
 
 /**
@@ -69,25 +53,6 @@ const compareSemVer = (a, b) => {
 };
 
 /**
- * Validate H3 headings
- * @param {string} text
- */
-const validateH3 = (text) => {
-    const headings = text.match(/^###(\s*\w*)$/gm) || [];
-
-    headings.forEach((heading) => {
-        const re = `^###\\s(${changeTypes.join('|')})$`;
-        const regex = new RegExp(re, 'g');
-
-        if (!regex.test(heading)) {
-            throw new Error(`${heading} is not a valid change type`);
-        } else if (!checkHeadingSpaces(heading, 3)) {
-            throw new Error(`${heading} has incorrect spaces`);
-        }
-    });
-};
-
-/**
  * Validate if the given date is correct
  * @param {string} date
  */
@@ -102,65 +67,194 @@ const validateDate = (date) => {
         return newDate;
     }
 
-    throw new Error(`Invalid date "${date}"`);
+    return false;
 };
 
 const isUnreleased = (unreleased, date) => Boolean(unreleased) || date === 'Unreleased';
 
+const getTitle = (text) => text.match(/^#[ ]{1,}(.+)$/) || [];
+const isVersion = (text) => text.match(/^##[ ]{1,}.+/);
+const isType = (text) => text.match(/^###[ ]{1,}.+/);
+
 /**
- * Validate H2 headings
+ * Check all errors present in the given changelog
  * @param {string} text
  * @returns {object}
  */
-const validateH2 = (text) => {
-    const headings = text.match(/^##\s.*$/gm) || [];
+const validateChangelog = (text) => {
+    const errors = [];
+    const skeleton = {
+        titles: [],
+        versions: [],
+        versionsContent: {},
+    };
+    let lastVersion = null;
 
-    if (headings.filter((heading) => heading.toLowerCase().includes('unreleased')).length > 1) {
-        throw new Error('Only one unreleased heading is allowed');
-    }
+    const lines = text.split('\n');
 
-    let previousVersion;
-    headings.forEach((heading) => {
-        const [, unreleased, version, date] = heading.match(reH2) || [];
+    lines.forEach((line, i) => {
+        const lineNumber = i + 1;
+        const [, title] = getTitle(line);
+        const version = isVersion(line);
+        const type = isType(line);
 
-        const currentVersion = version;
+        if (title) {
+            skeleton.titles.push({
+                value: title,
+                lineNumber,
+            });
 
-        // Check if the date is valid
-        if (!isUnreleased(unreleased, date)) {
-            if (!date) {
-                throw new Error(`A date is required for version "${heading}"`);
+            if (!checkHeadingSpaces(line, 1)) {
+                errors.push({
+                    message: 'Title has incorrect spaces',
+                    lines: [lineNumber],
+                });
             }
-        }
+        } else if (version) {
+            const [, unreleased, versionValue, date] = line.match(reH2) || [];
 
-        if (previousVersion && currentVersion) {
-            const compare = compareSemVer(previousVersion, currentVersion);
+            if (!isUnreleased(unreleased, date)) {
+                if (!date) {
+                    errors.push({
+                        message: 'A valid date is required for a version',
+                        lines: [lineNumber],
+                    });
+                }
 
-            if (previousVersion === currentVersion) {
-                throw new Error(`Version ${previousVersion} can't be the same as a previous version`);
-            } else if (compare === -1) {
-                throw new Error(`Version ${previousVersion} can't be smaller than a previous version`);
+                if (date && !validateDate(date)) {
+                    errors.push({
+                        message: `Date "${date}" is not valid`,
+                        lines: [lineNumber],
+                    });
+                }
             }
-        }
 
-        if (currentVersion) {
-            previousVersion = currentVersion;
+            if (!checkHeadingSpaces(line, 2)) {
+                errors.push({
+                    message: 'Has incorrect spaces',
+                    lines: [lineNumber],
+                });
+            }
+
+            skeleton.versions.push({
+                value: unreleased || versionValue,
+                lineNumber,
+                date: unreleased || date,
+            });
+            lastVersion = unreleased || versionValue;
+        } else if (type) {
+            const re = `^###\\s+(${changeTypes.join('|')})$`;
+            const regex = new RegExp(re);
+
+            const [, typeValue] = line.match(regex) || [];
+
+            if (!typeValue) {
+                errors.push({
+                    message: `Is not a valid type of (${changeTypes.join('|')})`,
+                    lines: [lineNumber],
+                });
+            } else {
+                if (!skeleton.versionsContent[lastVersion]) {
+                    skeleton.versionsContent[lastVersion] = [];
+                }
+                skeleton.versionsContent[lastVersion].push({
+                    value: typeValue,
+                    lineNumber,
+                });
+            }
+
+            if (!checkHeadingSpaces(line, 3)) {
+                errors.push({
+                    message: 'Type has incorrect spaces',
+                    lines: [lineNumber],
+                });
+            }
         }
     });
 
-    // Return the newest heading information
-    const [, unreleased, version, date] = headings[0].match(reH2) || [];
-    return {
-        isUnreleased: isUnreleased(unreleased, date),
-        version,
-        date,
-    };
-};
+    // Title validations
+    if (skeleton.titles.length === 0) {
+        errors.push({
+            message: 'No title is present',
+        });
+    } else if (skeleton.titles.length > 1) {
+        errors.push({
+            message: 'Only one title is allowed',
+            lines: skeleton.titles.map((title) => title.lineNumber),
+        });
+    }
 
-const validateChangelog = (text) => {
-    validateH1(text);
-    const newestHeading = validateH2(text);
-    validateH3(text);
-    return newestHeading;
+    // Check only one unreleased
+    const unreleasedVersions = skeleton.versions.filter((version) => version.date === 'Unreleased');
+
+    if (unreleasedVersions.length > 1) {
+        errors.push({
+            message: 'Only one unreleased version is permitted',
+            lines: unreleasedVersions.map((version) => version.lineNumber),
+        });
+    }
+
+    // Check repeated versions
+    const repeatedCounts = skeleton.versions.reduce((acc, version) => {
+        acc[version.value] = ++acc[version.value] || 0;
+        return acc;
+    }, {});
+
+    const repeatedVersions = skeleton.versions.filter((e) => repeatedCounts[e.value]);
+
+    if (repeatedVersions.length) {
+        errors.push({
+            message: 'Version repeated on lines',
+            lines: repeatedVersions.map((version) => version.lineNumber),
+        });
+    }
+
+    // Check if prev version is smaller than next
+    skeleton.versions.forEach((version, i) => {
+        if (skeleton.versions[i - 1]
+            && skeleton.versions[i - 1].value !== 'Unreleased'
+            && skeleton.versions[i - 1].value !== undefined
+            && compareSemVer(skeleton.versions[i - 1].value, version.value) === -1) {
+            errors.push({
+                message: 'Previous version can\'t be smaller than the next one',
+                lines: [skeleton.versions[i - 1].lineNumber, version.lineNumber],
+            });
+        }
+    });
+
+    // Check duplicated headings for version
+    Object.entries(skeleton.versionsContent).forEach(([version, headings]) => {
+        const unrepeatedHeadings = new Set(headings.map((heading) => heading.value));
+        if (unrepeatedHeadings.size !== headings.length) {
+            errors.push({
+                message: `Version "${version}" can't have repeated headings`,
+                lines: [skeleton.versions.find((v) => v.value === version).lineNumber],
+            });
+        }
+    });
+
+    // Combine and throw errors
+    if (errors.length) {
+        const errorLog = [];
+        errors.forEach((error) => {
+            errorLog.push(`\n${error.message}`);
+            if (error.lines) {
+                error.lines.forEach((line, i) => {
+                    errorLog.push((`${i === error.lines.length - 1 ? ' └─ ' : ' ├─ '}Line: ${line}, ${lines[line - 1]}`));
+                });
+            }
+        });
+        throw new Error(errorLog.join('\n'));
+    }
+
+    // Return the last version
+    const latestVersion = skeleton.versions[0];
+
+    return {
+        isUnreleased: isUnreleased(latestVersion.unreleased, latestVersion.date),
+        version: latestVersion.value,
+        date: latestVersion.date,
+    };
 };
 
 module.exports = {
