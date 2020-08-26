@@ -9722,11 +9722,19 @@ const validateChangelog = (text) => {
                 });
             }
 
-            skeleton.versions.push({
-                value: unreleased || versionValue,
-                lineNumber,
-                date: unreleased || date,
-            });
+            if (unreleased || versionValue) {
+                skeleton.versions.push({
+                    value: unreleased || versionValue,
+                    lineNumber,
+                    date: unreleased || date,
+                });
+            } else {
+                errors.push({
+                    message: 'Is not a valid version',
+                    lines: [lineNumber],
+                });
+            }
+
             lastVersion = unreleased || versionValue;
         } else if (type) {
             const re = `^###\\s+(${changeTypes.join('|')})$`;
