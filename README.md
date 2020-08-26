@@ -12,6 +12,7 @@ GitHub Action to validate CHANGELOG.md files and indicate if the changelog shoul
   - Versions should be in decremental order from top to bottom
   - It cannot contain two equal versions
   - Headings should have a correct number of spaces
+  - Headings space before and after
   - H3 headings must be of a valid type
     - Added
     - Changed
