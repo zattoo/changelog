@@ -64,6 +64,11 @@ describe('validateChangelog', () => {
         const nextVersionGreaterThanPrevious = await readFile('./src/__test__/changelogs/duplicatedHeadings.md', {encoding: 'utf-8'});
         expect(() => validateChangelog(nextVersionGreaterThanPrevious)).toThrow('Version "0.0.2" can\'t have repeated headings');
     });
+
+    it('should throw error if for headings with incorrect empty lines', async () => {
+        const nextVersionGreaterThanPrevious = await readFile('./src/__test__/changelogs/emptyLines.md', {encoding: 'utf-8'});
+        expect(() => validateChangelog(nextVersionGreaterThanPrevious)).toThrow('A version heading needs an empty line after');
+    });
 });
 
 describe('compareSemVer', () => {

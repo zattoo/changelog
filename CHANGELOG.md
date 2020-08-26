@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 
+## [1.3.0] - 26.08.2020
+
+### Added
+- Validate empty lines
+
 ## [1.2.0] - 23.08.2020
 
 ### Added

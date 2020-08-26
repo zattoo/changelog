@@ -9675,6 +9675,13 @@ const validateChangelog = (text) => {
                     lines: [lineNumber],
                 });
             }
+
+            if (lines[i - 1] !== undefined) {
+                errors.push({
+                    message: 'Title should be the fist line of the document',
+                    lines: [lineNumber],
+                });
+            }
         } else if (version) {
             const [, unreleased, versionValue, date] = line.match(reH2) || [];
 
@@ -9697,6 +9704,20 @@ const validateChangelog = (text) => {
             if (!checkHeadingSpaces(line, 2)) {
                 errors.push({
                     message: 'Has incorrect spaces',
+                    lines: [lineNumber],
+                });
+            }
+
+            if (lines[i - 1] !== '') {
+                errors.push({
+                    message: 'A version heading needs an empty line before',
+                    lines: [lineNumber],
+                });
+            }
+
+            if (lines[i + 1] !== '') {
+                errors.push({
+                    message: 'A version heading needs an empty line after',
                     lines: [lineNumber],
                 });
             }
@@ -9731,6 +9752,20 @@ const validateChangelog = (text) => {
             if (!checkHeadingSpaces(line, 3)) {
                 errors.push({
                     message: 'Type has incorrect spaces',
+                    lines: [lineNumber],
+                });
+            }
+
+            if (lines[i - 1] !== '') {
+                errors.push({
+                    message: 'A type heading needs an empty line before',
+                    lines: [lineNumber],
+                });
+            }
+
+            if (lines[i + 1] === '') {
+                errors.push({
+                    message: 'A type heading can\'t have an empty line after',
                     lines: [lineNumber],
                 });
             }
