@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 
 ## [1.3.0] - 26.08.2020
 
-## Added
+### Added
 - Validate empty lines
 
 ## [1.2.0] - 23.08.2020
