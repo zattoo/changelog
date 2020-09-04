@@ -19,6 +19,7 @@ const run = async () => {
     const token = core.getInput('token', {required: true});
     const octokit = getOctokit(token);
     const sources = core.getInput('sources', {required: false});
+    const branches = core.getInput('branches', {required: false}) || ['release'];
     const ignoreActionLabel = core.getInput('ignoreActionLabel');
 
     const repo = context.payload.repository.name;
@@ -55,17 +56,17 @@ const run = async () => {
             } = validateChangelog(changelogContent);
 
             // Checks if the branch is release
-            if (branch === 'release') {
+            if (branches.includes(branch)) {
                 if (isUnreleased) {
-                    throw new Error('A release branch can\'t be unreleased');
+                    throw new Error(`"${branch}" branch can't be unreleased`);
                 }
 
                 if (!version || version === 'Unreleased') {
-                    throw new Error('A release branch should have a version');
+                    throw new Error(`"${branch}" branch should have a version`);
                 }
 
                 if (!date) {
-                    throw new Error('A release branch should have a date');
+                    throw new Error(`"${branch}" branch should have a date`);
                 }
 
                 const {version: packageVersion} = JSON.parse(await readFile(`${folder}package.json`, {encoding: 'utf-8'}));

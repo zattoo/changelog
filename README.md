@@ -44,6 +44,13 @@ Required. GitHub token
 Optional. String with folders to watch separated by commas
 Example : 'projects/app/, projects/embed/, projects/account/'
 
+### `branches`
+
+`array of strings`
+
+Optional. String with branches to watch separated by commas
+Example : 'release, hotfix'
+
 ### `ignoreActionLabel`
 
 `string`,  default: `-changelog`
