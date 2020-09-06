@@ -6,7 +6,8 @@ const readFile = util.promisify(fs.readFile);
 const stat = util.promisify(fs.stat);
 
 const {
-    context, getOctokit,
+    context,
+    getOctokit,
 } = require('@actions/github');
 
 const {validateChangelog} = require('./validate');
@@ -19,7 +20,8 @@ const run = async () => {
     const token = core.getInput('token', {required: true});
     const octokit = getOctokit(token);
     const sources = core.getInput('sources', {required: false});
-    const branches = core.getInput('branches', {required: false}) || ['release'];
+    const branchesInput = core.getInput('branches', {required: false});
+    const branches = (branchesInput && branchesInput.split(/, */g)) || ['release'];
     const ignoreActionLabel = core.getInput('ignoreActionLabel');
 
     const repo = context.payload.repository.name;
@@ -52,7 +54,10 @@ const run = async () => {
 
             const changelogContent = await readFile(`${folder}CHANGELOG.md`, {encoding: 'utf-8'});
             const {
-                isUnreleased, version, date,
+                isUnreleased,
+                version,
+                date,
+                skeleton,
             } = validateChangelog(changelogContent);
 
             // Checks if the branch is release
@@ -80,6 +85,19 @@ const run = async () => {
                     const {version: packageLockVersion} = JSON.parse(await readFile(`${folder}package-lock.json`, {encoding: 'utf-8'}));
                     if (packageLockVersion !== version) {
                         throw new Error(`The package-lock version "${packageVersion}" does not match the newest version "${version}"`);
+                    }
+                }
+
+                // Validate if branch contains breaking changes
+                // and version has the same major version as previous.
+                if (branch === 'release') {
+                    const text = skeleton.versionText[version].map((v) => v.value).join();
+                    const previousVersion = skeleton.versions[1];
+                    if (
+                        text.includes('breaking change')
+                        && (previousVersion.value.split('.')[0] === version.split('.')[0])
+                    ) {
+                        throw new Error('This release includes breaking changes, major version should be increased.');
                     }
                 }
             }
