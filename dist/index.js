@@ -9652,6 +9652,7 @@ const validateChangelog = (text) => {
         titles: [],
         versions: [],
         versionsContent: {},
+        versionText: {},
     };
     let lastVersion = null;
 
@@ -9777,6 +9778,16 @@ const validateChangelog = (text) => {
                     lines: [lineNumber],
                 });
             }
+        } else if (line !== '') {
+            if (lastVersion) {
+                if (!skeleton.versionText[lastVersion]) {
+                    skeleton.versionText[lastVersion] = [];
+                }
+                skeleton.versionText[lastVersion].push({
+                    lineNumber,
+                    value: line,
+                });
+            }
         }
     });
 
@@ -9862,6 +9873,7 @@ const validateChangelog = (text) => {
         isUnreleased: isUnreleased(latestVersion.unreleased, latestVersion.date),
         version: latestVersion.value,
         date: latestVersion.date,
+        skeleton,
     };
 };
 
@@ -10089,7 +10101,8 @@ const readFile = util.promisify(fs.readFile);
 const stat = util.promisify(fs.stat);
 
 const {
-    context, getOctokit,
+    context,
+    getOctokit,
 } = __webpack_require__(469);
 
 const {validateChangelog} = __webpack_require__(601);
@@ -10102,6 +10115,8 @@ const run = async () => {
     const token = core.getInput('token', {required: true});
     const octokit = getOctokit(token);
     const sources = core.getInput('sources', {required: false});
+    const branchesInput = core.getInput('branches', {required: false});
+    const branches = (branchesInput && branchesInput.split(/, */g)) || ['release'];
     const ignoreActionLabel = core.getInput('ignoreActionLabel');
 
     const repo = context.payload.repository.name;
@@ -10134,21 +10149,24 @@ const run = async () => {
 
             const changelogContent = await readFile(`${folder}CHANGELOG.md`, {encoding: 'utf-8'});
             const {
-                isUnreleased, version, date,
+                isUnreleased,
+                version,
+                date,
+                skeleton,
             } = validateChangelog(changelogContent);
 
             // Checks if the branch is release
-            if (branch === 'release') {
+            if (branches.includes(branch)) {
                 if (isUnreleased) {
-                    throw new Error('A release branch can\'t be unreleased');
+                    throw new Error(`"${branch}" branch can't be unreleased`);
                 }
 
                 if (!version || version === 'Unreleased') {
-                    throw new Error('A release branch should have a version');
+                    throw new Error(`"${branch}" branch should have a version`);
                 }
 
                 if (!date) {
-                    throw new Error('A release branch should have a date');
+                    throw new Error(`"${branch}" branch should have a date`);
                 }
 
                 const {version: packageVersion} = JSON.parse(await readFile(`${folder}package.json`, {encoding: 'utf-8'}));
@@ -10162,6 +10180,19 @@ const run = async () => {
                     const {version: packageLockVersion} = JSON.parse(await readFile(`${folder}package-lock.json`, {encoding: 'utf-8'}));
                     if (packageLockVersion !== version) {
                         throw new Error(`The package-lock version "${packageVersion}" does not match the newest version "${version}"`);
+                    }
+                }
+
+                // Validate if branch contains breaking changes
+                // and version has the same major version as previous.
+                if (branch === 'release') {
+                    const text = skeleton.versionText[version].map((v) => v.value).join();
+                    const previousVersion = skeleton.versions[1];
+                    if (
+                        text.includes('breaking change')
+                        && (previousVersion.value.split('.')[0] === version.split('.')[0])
+                    ) {
+                        throw new Error('This release includes breaking changes, major version should be increased.');
                     }
                 }
             }
