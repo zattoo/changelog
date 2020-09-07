@@ -9778,16 +9778,14 @@ const validateChangelog = (text) => {
                     lines: [lineNumber],
                 });
             }
-        } else if (line !== '') {
-            if (lastVersion) {
-                if (!skeleton.versionText[lastVersion]) {
-                    skeleton.versionText[lastVersion] = [];
-                }
-                skeleton.versionText[lastVersion].push({
-                    lineNumber,
-                    value: line,
-                });
+        } else if (line !== '' && lastVersion) {
+            if (!skeleton.versionText[lastVersion]) {
+                skeleton.versionText[lastVersion] = [];
             }
+            skeleton.versionText[lastVersion].push({
+                lineNumber,
+                value: line,
+            });
         }
     });
 
@@ -10155,7 +10153,7 @@ const run = async () => {
                 skeleton,
             } = validateChangelog(changelogContent);
 
-            // Checks if the branch is release
+            // Checks if the branch is release or branches input.
             if (branches.includes(branch)) {
                 if (isUnreleased) {
                     throw new Error(`"${branch}" branch can't be unreleased`);
