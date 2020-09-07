@@ -60,7 +60,7 @@ const run = async () => {
                 skeleton,
             } = validateChangelog(changelogContent);
 
-            // Checks if the branch is release
+            // Checks if the branch is release or branches input.
             if (branches.includes(branch)) {
                 if (isUnreleased) {
                     throw new Error(`"${branch}" branch can't be unreleased`);
