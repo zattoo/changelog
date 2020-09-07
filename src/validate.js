@@ -213,16 +213,14 @@ const validateChangelog = (text) => {
                     lines: [lineNumber],
                 });
             }
-        } else if (line !== '') {
-            if (lastVersion) {
-                if (!skeleton.versionText[lastVersion]) {
-                    skeleton.versionText[lastVersion] = [];
-                }
-                skeleton.versionText[lastVersion].push({
-                    lineNumber,
-                    value: line,
-                });
+        } else if (line !== '' && lastVersion) {
+            if (!skeleton.versionText[lastVersion]) {
+                skeleton.versionText[lastVersion] = [];
             }
+            skeleton.versionText[lastVersion].push({
+                lineNumber,
+                value: line,
+            });
         }
     });
 
