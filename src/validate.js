@@ -87,6 +87,7 @@ const validateChangelog = (text) => {
         titles: [],
         versions: [],
         versionsContent: {},
+        versionText: {},
     };
     let lastVersion = null;
 
@@ -212,6 +213,14 @@ const validateChangelog = (text) => {
                     lines: [lineNumber],
                 });
             }
+        } else if (line !== '' && lastVersion) {
+            if (!skeleton.versionText[lastVersion]) {
+                skeleton.versionText[lastVersion] = [];
+            }
+            skeleton.versionText[lastVersion].push({
+                lineNumber,
+                value: line,
+            });
         }
     });
 
@@ -297,6 +306,7 @@ const validateChangelog = (text) => {
         isUnreleased: isUnreleased(latestVersion.unreleased, latestVersion.date),
         version: latestVersion.value,
         date: latestVersion.date,
+        skeleton,
     };
 };
 

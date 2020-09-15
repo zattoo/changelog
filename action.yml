@@ -7,6 +7,9 @@ inputs:
   sources:
     description: 'String with folders to watch separated by commas'
     required: false
+  release_branches:
+    description: 'String with branches to watch separated by commas'
+    required: false
   ignoreActionLabel:
     description: 'Label to avoid executing the action'
     required: false
