@@ -20,8 +20,8 @@ const run = async () => {
     const token = core.getInput('token', {required: true});
     const octokit = getOctokit(token);
     const sources = core.getInput('sources', {required: false});
-    const branchesInput = core.getInput('branches', {required: false});
-    const branches = (branchesInput && branchesInput.split(/, */g)) || ['release'];
+    const releaseBranchesInput = core.getInput('release_branches', {required: false});
+    const releaseBranches = (releaseBranchesInput && releaseBranchesInput.split(/, */g)) || ['release'];
     const ignoreActionLabel = core.getInput('ignoreActionLabel');
 
     const repo = context.payload.repository.name;
@@ -60,8 +60,8 @@ const run = async () => {
                 skeleton,
             } = validateChangelog(changelogContent);
 
-            // Checks if the branch is release or branches input.
-            if (branches.includes(branch)) {
+            // Checks if the branch is release or once of release_branches input.
+            if (releaseBranches.includes(branch)) {
                 if (isUnreleased) {
                     throw new Error(`"${branch}" branch can't be unreleased`);
                 }

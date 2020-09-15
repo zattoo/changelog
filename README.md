@@ -44,7 +44,7 @@ Required. GitHub token
 Optional. String with folders to watch separated by commas
 Example : 'projects/app/, projects/embed/, projects/account/'
 
-### `branches`
+### `release_branches`
 
 `array of strings`
 

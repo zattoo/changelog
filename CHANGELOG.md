@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 
-## [1.4.0] - 06.09.2020
+## [1.4.0] - 15.09.2020
 
 ### Added
 - Validate breaking changes
