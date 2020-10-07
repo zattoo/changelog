@@ -10161,7 +10161,7 @@ const run = async () => {
             } = validateChangelog(changelogContent);
 
             // Checks if the branch is release or once of release_branches input.
-            if (releaseBranches.includes(branch)) {
+            if (releaseBranches.find((releaseBranch) => branch.startsWith(releaseBranch))) {
                 if (isUnreleased) {
                     throw new Error(`"${branch}" branch can't be unreleased`);
                 }
@@ -10190,7 +10190,7 @@ const run = async () => {
 
                 // Validate if branch contains breaking changes
                 // and version has the same major version as previous.
-                if (branch === 'release') {
+                if (branch.startsWith('release')) {
                     const text = skeleton.versionText[version].map((v) => v.value).join();
                     const previousVersion = skeleton.versions[1];
                     if (
