@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 
 ## [1.5.0] - 07.10.2020
 
-### Changed
+### Added
 -  Support dynamic release branches
 
 ## [1.4.0] - 15.09.2020
