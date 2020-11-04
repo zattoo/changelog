@@ -45,7 +45,37 @@ const getModifiedFiles = async (octokit, repo, owner, pullNumber) => {
     return files.data.map((file) => file.filename);
 };
 
+/**
+ * Returns the content of a file
+ * @param {function} octokit
+ * @param {string} repo
+ * @param {string} owner
+ * @param {string} path
+ * @param {string} [ref] - Default: the repository’s default
+ */
+const getFileContent = async (octokit, repo, owner, path, ref) => {
+    try {
+        const content = await octokit.repos.getContent({
+            owner,
+            repo,
+            path,
+            ref,
+        });
+
+        if (content.data?.content) {
+            return Buffer.from(content.data.content, 'base64').toString();
+        }
+    } catch (error) {
+        /**
+         * Cases where file does not exists
+         * should not stop execution
+         */
+        console.log(error);
+    }
+};
+
 module.exports = {
     getFolders,
     getModifiedFiles,
+    getFileContent,
 };

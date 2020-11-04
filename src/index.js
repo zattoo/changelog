@@ -3,17 +3,18 @@ const core = require('@actions/core');
 const util = require('util');
 
 const readFile = util.promisify(fs.readFile);
-const stat = util.promisify(fs.stat);
 
 const {
     context,
     getOctokit,
 } = require('@actions/github');
 
+const {validateRelease} = require('./release');
 const {validateChangelog} = require('./validate');
 const {
-    getModifiedFiles,
+    getFileContent,
     getFolders,
+    getModifiedFiles,
 } = require('./files');
 
 const run = async () => {
@@ -53,51 +54,42 @@ const run = async () => {
             }
 
             const changelogContent = await readFile(`${folder}CHANGELOG.md`, {encoding: 'utf-8'});
-            const {
-                isUnreleased,
-                version,
-                date,
-                skeleton,
-            } = validateChangelog(changelogContent);
+            validateChangelog(changelogContent);
+        }
 
-            // Checks if the branch is release or once of release_branches input.
-            if (releaseBranches.find((releaseBranch) => branch.startsWith(releaseBranch))) {
-                if (isUnreleased) {
-                    throw new Error(`"${branch}" branch can't be unreleased`);
-                }
+        // Checks if the branch is release or once of release_branches input.
+        if (releaseBranches.find((releaseBranch) => branch.startsWith(releaseBranch))) {
+            const changelogs = modifiedFiles.filter((file) => file.endsWith('.md'));
 
-                if (!version || version === 'Unreleased') {
-                    throw new Error(`"${branch}" branch should have a version`);
-                }
+            /**
+             * If only one changelog is modified
+             * there is no doubt of which one is correct
+             */
+            if (changelogs.length === 1) {
+                validateRelease(changelogs[0], branch);
+            }
 
-                if (!date) {
-                    throw new Error(`"${branch}" branch should have a date`);
-                }
+            if (changelogs.length > 1) {
+                /** If branch name contains project ex: release/account */
+                const project = branch.includes('/') && branch.split('/').slice(-1)[0];
 
-                const {version: packageVersion} = JSON.parse(await readFile(`${folder}package.json`, {encoding: 'utf-8'}));
-                if (packageVersion !== version) {
-                    throw new Error(`The package version "${packageVersion}" does not match the newest version "${version}"`);
-                }
+                if (project) {
+                    changelogs.filter((file) => file.includes(`${project}/CHANGELOG.md`))
+                        .forEach((changelog) => validateRelease(changelog, branch));
+                } else {
+                    /** For each changelog determine if last version is different than production */
+                    for await (const path of changelogs) {
+                        const previousText = await getFileContent(octokit, repo, owner, path, 'production');
+                        const currentText = await getFileContent(octokit, repo, owner, path, branch);
 
-                const packageLockStats = await stat(`${folder}package-lock.json`);
+                        if (previousText && currentText) {
+                            const previousContent = validateChangelog(previousText);
+                            const currentContent = validateChangelog(currentText);
 
-                if (packageLockStats) {
-                    const {version: packageLockVersion} = JSON.parse(await readFile(`${folder}package-lock.json`, {encoding: 'utf-8'}));
-                    if (packageLockVersion !== version) {
-                        throw new Error(`The package-lock version "${packageVersion}" does not match the newest version "${version}"`);
-                    }
-                }
-
-                // Validate if branch contains breaking changes
-                // and version has the same major version as previous.
-                if (branch.startsWith('release')) {
-                    const text = skeleton.versionText[version].map((v) => v.value).join();
-                    const previousVersion = skeleton.versions[1];
-                    if (
-                        text.includes('breaking change')
-                        && (previousVersion.value.split('.')[0] === version.split('.')[0])
-                    ) {
-                        throw new Error('This release includes breaking changes, major version should be increased.');
+                            if (previousContent.version !== currentContent.version) {
+                                validateRelease(path, branch);
+                            }
+                        }
                     }
                 }
             }
