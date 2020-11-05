@@ -64,7 +64,7 @@ const run = async () => {
 
         // Checks if the branch is release or once of release_branches input.
         if (releaseBranches.find((releaseBranch) => branch.startsWith(releaseBranch))) {
-            const changelogs = modifiedFiles.filter((file) => file.endsWith('.md'));
+            const changelogs = modifiedFiles.filter((file) => file.endsWith('CHANGELOG.md'));
 
             /**
              * If only one changelog is modified
@@ -89,7 +89,7 @@ const run = async () => {
                             repo,
                             owner,
                             path,
-                            branch: 'production',
+                            ref: 'production',
                         });
                         const currentText = await getFileContent({
                             octokit,
@@ -102,6 +102,8 @@ const run = async () => {
                         if (previousText && currentText) {
                             const previousContent = validateChangelog(previousText);
                             const currentContent = validateChangelog(currentText);
+
+                            console.log(previousContent.length, currentContent.length);
 
                             if (
                                 !previousContent.isUnreleased &&
