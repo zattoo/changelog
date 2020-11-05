@@ -2,14 +2,15 @@ const fs = require('fs');
 const util = require('util');
 
 const readFile = util.promisify(fs.readFile);
-const stat = util.promisify(fs.stat);
+const exists = util.promisify(fs.exists);
 
 const {validateChangelog} = require('./validate');
 
 const validateRelease = async (changelog, branch) => {
-    const folder = changelog.replace('/CHANGELOG.md', '');
+    const folder = changelog.replace('CHANGELOG.md', '');
 
     const changelogContent = await readFile(changelog, {encoding: 'utf-8'});
+
     const {
         isUnreleased,
         version,
@@ -34,9 +35,7 @@ const validateRelease = async (changelog, branch) => {
         throw new Error(`The package version "${packageVersion}" does not match the newest version "${version}"`);
     }
 
-    const packageLockStats = await stat(`${folder}package-lock.json`);
-
-    if (packageLockStats) {
+    if (await exists(`${folder}package-lock.json`)) {
         const {version: packageLockVersion} = JSON.parse(await readFile(`${folder}package-lock.json`, {encoding: 'utf-8'}));
         if (packageLockVersion !== version) {
             throw new Error(`The package-lock version "${packageVersion}" does not match the newest version "${version}"`);

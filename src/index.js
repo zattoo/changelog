@@ -80,7 +80,7 @@ const run = async () => {
 
                 if (project) {
                     changelogs.filter((file) => file.includes(`${project}/CHANGELOG.md`))
-                        .forEach((changelog) => validateRelease(changelog, branch));
+                        .forEach((file) => validateRelease(file, branch));
                 } else {
                     /** For each changelog determine if last version is different than production */
                     for await (const path of changelogs) {
@@ -103,7 +103,11 @@ const run = async () => {
                             const previousContent = validateChangelog(previousText);
                             const currentContent = validateChangelog(currentText);
 
-                            if (previousContent.version !== currentContent.version) {
+                            if (
+                                !previousContent.isUnreleased &&
+                                !currentContent.isUnreleased &&
+                                previousContent.version !== currentContent.version
+                            ) {
                                 validateRelease(path, branch);
                             }
                         }
