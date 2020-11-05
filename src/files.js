@@ -34,6 +34,7 @@ const getFolders = async (sources) => {
  * @param {string} params.repo
  * @param {string} params.owner
  * @param {number} params.pullNumber
+ * @returns {Promise<string[]>}
  */
 const getModifiedFiles = async ({
     octokit,
@@ -59,6 +60,7 @@ const getModifiedFiles = async ({
  * @param {string} params.owner
  * @param {string} params.path
  * @param {string} [params.ref] - Default: the repository’s default
+ * @returns {Promise<string>}
  */
 const getFileContent = async ({
     octokit,
@@ -75,15 +77,14 @@ const getFileContent = async ({
             ref,
         });
 
-        if (content.data?.content) {
-            return Buffer.from(content.data.content, 'base64').toString();
-        }
+        return content.data?.content && Buffer.from(content.data.content, 'base64').toString();
     } catch (error) {
         /**
          * Cases where file does not exists
          * should not stop execution
          */
-        console.log(error);
+        console.log(error.message);
+        return null;
     }
 };
 
