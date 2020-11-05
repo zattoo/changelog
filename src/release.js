@@ -7,6 +7,7 @@ const exists = util.promisify(fs.exists);
 const {validateChangelog} = require('./validate');
 
 const validateRelease = async (changelog, branch) => {
+    console.info(changelog);
     const folder = changelog.replace('CHANGELOG.md', '');
 
     const changelogContent = await readFile(changelog, {encoding: 'utf-8'});

@@ -103,8 +103,6 @@ const run = async () => {
                             const previousContent = validateChangelog(previousText);
                             const currentContent = validateChangelog(currentText);
 
-                            console.log(previousContent.length, currentContent.length);
-
                             if (
                                 !previousContent.isUnreleased &&
                                 !currentContent.isUnreleased &&
