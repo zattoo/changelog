@@ -29,12 +29,18 @@ const getFolders = async (sources) => {
 
 /**
  * Returns the modified files in the PR
- * @param {function} octokit
- * @param {string} repo
- * @param {string} owner
- * @param {number} pullNumber
+ * @param {Object} params
+ * @param {function} params.octokit
+ * @param {string} params.repo
+ * @param {string} params.owner
+ * @param {number} params.pullNumber
  */
-const getModifiedFiles = async (octokit, repo, owner, pullNumber) => {
+const getModifiedFiles = async ({
+    octokit,
+    repo,
+    owner,
+    pullNumber,
+}) => {
     const files = await octokit.pulls.listFiles({
         owner,
         repo,
@@ -47,13 +53,20 @@ const getModifiedFiles = async (octokit, repo, owner, pullNumber) => {
 
 /**
  * Returns the content of a file
- * @param {function} octokit
- * @param {string} repo
- * @param {string} owner
- * @param {string} path
- * @param {string} [ref] - Default: the repository’s default
+ * @param {Object} params
+ * @param {function} params.octokit
+ * @param {string} params.repo
+ * @param {string} params.owner
+ * @param {string} params.path
+ * @param {string} [params.ref] - Default: the repository’s default
  */
-const getFileContent = async (octokit, repo, owner, path, ref) => {
+const getFileContent = async ({
+    octokit,
+    repo,
+    owner,
+    path,
+    ref,
+}) => {
     try {
         const content = await octokit.repos.getContent({
             owner,

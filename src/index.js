@@ -38,7 +38,12 @@ const run = async () => {
             process.exit(0);
         }
 
-        const modifiedFiles = await getModifiedFiles(octokit, repo, owner, pullNumber);
+        const modifiedFiles = await getModifiedFiles({
+            octokit,
+            repo,
+            owner,
+            pullNumber,
+        });
         const folders = await getFolders(sources);
 
         for await (const path of folders) {
@@ -79,8 +84,20 @@ const run = async () => {
                 } else {
                     /** For each changelog determine if last version is different than production */
                     for await (const path of changelogs) {
-                        const previousText = await getFileContent(octokit, repo, owner, path, 'production');
-                        const currentText = await getFileContent(octokit, repo, owner, path, branch);
+                        const previousText = await getFileContent({
+                            octokit,
+                            repo,
+                            owner,
+                            path,
+                            branch: 'production',
+                        });
+                        const currentText = await getFileContent({
+                            octokit,
+                            repo,
+                            owner,
+                            path,
+                            ref: branch,
+                        });
 
                         if (previousText && currentText) {
                             const previousContent = validateChangelog(previousText);
