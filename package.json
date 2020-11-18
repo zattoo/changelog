@@ -1,6 +1,6 @@
 {
   "name": "changelog",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "description": "Detects changes and validates a given changelog",
   "main": "src/index.js",
   "scripts": {
@@ -15,6 +15,7 @@
   "keywords": [
     "Actions",
     "Changelog",
+    "Changelog Validate",
     "GitHub",
     "JavaScript",
     "Validate"
@@ -26,15 +27,16 @@
   },
   "homepage": "https://github.com/zattoo/changelog#readme",
   "dependencies": {
-    "@actions/core": "1.2.4",
-    "@actions/github": "4.0.0"
+    "@actions/core": "1.2.6",
+    "@actions/github": "4.0.0",
+    "glob": "7.1.6"
   },
   "devDependencies": {
     "@zattoo/eslint-config": "^9.0.0",
     "@zeit/ncc": "0.22.3",
-    "eslint": "7.3.1",
+    "eslint": "7.7.0",
     "eslint-config-airbnb-base": "14.2.0",
     "eslint-plugin-import": "2.22.0",
-    "jest": "26.1.0"
+    "jest": "26.4.2"
   }
 }

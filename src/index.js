@@ -6,16 +6,22 @@ const readFile = util.promisify(fs.readFile);
 const stat = util.promisify(fs.stat);
 
 const {
-    context, getOctokit,
+    context,
+    getOctokit,
 } = require('@actions/github');
 
 const {validateChangelog} = require('./validate');
-const {getModifiedFiles} = require('./files');
+const {
+    getModifiedFiles,
+    getFolders,
+} = require('./files');
 
 const run = async () => {
     const token = core.getInput('token', {required: true});
     const octokit = getOctokit(token);
     const sources = core.getInput('sources', {required: false});
+    const releaseBranchesInput = core.getInput('release_branches', {required: false});
+    const releaseBranches = (releaseBranchesInput && releaseBranchesInput.split(/, */g)) || ['release'];
     const ignoreActionLabel = core.getInput('ignoreActionLabel');
 
     const repo = context.payload.repository.name;
@@ -23,7 +29,6 @@ const run = async () => {
     const pullNumber = context.payload.pull_request.number;
     const labels = context.payload.pull_request.labels.map((label) => label.name);
     const branch = context.payload.pull_request.head.ref;
-    const {sha} = context.payload.pull_request.head;
 
     try {
         // Ignore the action if -changelog label (or custom name) exists
@@ -33,7 +38,7 @@ const run = async () => {
         }
 
         const modifiedFiles = await getModifiedFiles(octokit, repo, owner, pullNumber);
-        const folders = Boolean(sources) ? sources.split(/, */g) : ['']
+        const folders = await getFolders(sources);
 
         for await (const path of folders) {
             const isRoot = path === '';
@@ -49,21 +54,24 @@ const run = async () => {
 
             const changelogContent = await readFile(`${folder}CHANGELOG.md`, {encoding: 'utf-8'});
             const {
-                isUnreleased, version, date,
+                isUnreleased,
+                version,
+                date,
+                skeleton,
             } = validateChangelog(changelogContent);
 
-            // Checks if the branch is release
-            if (branch === 'release') {
+            // Checks if the branch is release or once of release_branches input.
+            if (releaseBranches.find((releaseBranch) => branch.startsWith(releaseBranch))) {
                 if (isUnreleased) {
-                    throw new Error('A release branch can\'t be unreleased');
+                    throw new Error(`"${branch}" branch can't be unreleased`);
                 }
 
                 if (!version || version === 'Unreleased') {
-                    throw new Error('A release branch should have a version');
+                    throw new Error(`"${branch}" branch should have a version`);
                 }
 
                 if (!date) {
-                    throw new Error('A release branch should have a date');
+                    throw new Error(`"${branch}" branch should have a date`);
                 }
 
                 const {version: packageVersion} = JSON.parse(await readFile(`${folder}package.json`, {encoding: 'utf-8'}));
@@ -79,17 +87,22 @@ const run = async () => {
                         throw new Error(`The package-lock version "${packageVersion}" does not match the newest version "${version}"`);
                     }
                 }
+
+                // Validate if branch contains breaking changes
+                // and version has the same major version as previous.
+                if (branch.startsWith('release')) {
+                    const text = skeleton.versionText[version].map((v) => v.value).join();
+                    const previousVersion = skeleton.versions[1];
+                    if (
+                        text.includes('breaking change')
+                        && (previousVersion.value.split('.')[0] === version.split('.')[0])
+                    ) {
+                        throw new Error('This release includes breaking changes, major version should be increased.');
+                    }
+                }
             }
         }
     } catch (error) {
-        octokit.repos.createCommitStatus({
-            owner,
-            repo,
-            sha,
-            state: 'error',
-            description: error.message,
-            context: 'Changelog',
-        });
         core.setFailed(error.message);
     }
 };

@@ -1,4 +1,4 @@
-# 📋 Changelog
+# 📋 Changelog Validate
 GitHub Action to validate CHANGELOG.md files and indicate if the changelog should be modified based on watch folders.
 
 ## Validations:
@@ -7,10 +7,12 @@ GitHub Action to validate CHANGELOG.md files and indicate if the changelog shoul
   - Only one h2 with unreleased is allowed
   - H2 should contain a valid version or be unreleased
   - H2 heading should have a proper SemVer
-  - H2 Should have valid dates
+  - H2 should have valid dates
+  - No repeated H3 under the same H2
   - Versions should be in decremental order from top to bottom
   - It cannot contain two equal versions
   - Headings should have a correct number of spaces
+  - Headings space before and after
   - H3 headings must be of a valid type
     - Added
     - Changed
@@ -42,6 +44,13 @@ Required. GitHub token
 Optional. String with folders to watch separated by commas
 Example : 'projects/app/, projects/embed/, projects/account/'
 
+### `release_branches`
+
+`array of strings`
+
+Optional. String with branches to watch separated by commas
+Example : 'release, hotfix'
+
 ### `ignoreActionLabel`
 
 `string`,  default: `-changelog`
@@ -54,14 +63,12 @@ Pull request label name to avoid executing the action
 on: [pull_request]
 
 jobs:
-  validate_changelog:
+  changelog:
     runs-on: ubuntu-latest
-    name: Validate Changelog
+    name: Changelog Validate
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Use changelog action
-        uses: zattoo/changelog
+      - uses: actions/checkout@v2
+      - uses: zattoo/changelog@v1
         with:
-          token: ${{ github.token }}
-          sources: ['src/projects/a', 'src/projects/b']
+          token: ${{github.token}}
+          sources: 'src/projects/a/, src/projects/b/'
