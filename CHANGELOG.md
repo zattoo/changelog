@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 
-## [1.6.0] - 04.11.2020
+## Unreleased
 
 Added multiple changelogs support 
 
