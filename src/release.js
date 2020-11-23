@@ -45,15 +45,13 @@ const validateRelease = async (changelog, branch) => {
 
     // Validate if branch contains breaking changes
     // and version has the same major version as previous.
-    if (branch.startsWith('release')) {
-        const text = skeleton.versionText[version].map((v) => v.value).join();
-        const previousVersion = skeleton.versions[1];
-        if (
-            text.includes('breaking change')
+    const text = skeleton.versionText[version].map((v) => v.value).join();
+    const previousVersion = skeleton.versions[1];
+    if (
+        text.includes('breaking change')
             && (previousVersion.value.split('.')[0] === version.split('.')[0])
-        ) {
-            throw new Error('This release includes breaking changes, major version should be increased.');
-        }
+    ) {
+        throw new Error('This release includes breaking changes, major version should be increased.');
     }
 };
 
