@@ -5,9 +5,14 @@ const readFile = util.promisify(fs.readFile);
 const exists = util.promisify(fs.exists);
 
 const {validateChangelog} = require('./validate');
+const {getFileContent} = require('./files');
 
-const validateRelease = async (changelog, branch) => {
-    console.info(changelog);
+/**
+ * Given the path of a changelog it will
+ * validate if it's a correct release
+ * @param {string} changelog
+ */
+const validateRelease = async (changelog) => {
     const folder = changelog.replace('CHANGELOG.md', '');
 
     const changelogContent = await readFile(changelog, {encoding: 'utf-8'});
@@ -20,26 +25,26 @@ const validateRelease = async (changelog, branch) => {
     } = validateChangelog(changelogContent);
 
     if (isUnreleased) {
-        throw new Error(`"${branch}" branch can't be unreleased`);
+        throw new Error(`A release branch can't have "Unreleased" version for changelog: ${changelog}`);
     }
 
     if (!version || version === 'Unreleased') {
-        throw new Error(`"${branch}" branch should have a version`);
+        throw new Error(`A release branch should have a version for changelog ${changelog}`);
     }
 
     if (!date) {
-        throw new Error(`"${branch}" branch should have a date`);
+        throw new Error(`A release branch should have a date for changelog: ${changelog}`);
     }
 
     const {version: packageVersion} = JSON.parse(await readFile(`${folder}package.json`, {encoding: 'utf-8'}));
     if (packageVersion !== version) {
-        throw new Error(`The package version "${packageVersion}" does not match the newest version "${version}"`);
+        throw new Error(`The package version "${packageVersion}" does not match the newest version "${version}" of changelog: ${changelog}`);
     }
 
     if (await exists(`${folder}package-lock.json`)) {
         const {version: packageLockVersion} = JSON.parse(await readFile(`${folder}package-lock.json`, {encoding: 'utf-8'}));
         if (packageLockVersion !== version) {
-            throw new Error(`The package-lock version "${packageVersion}" does not match the newest version "${version}"`);
+            throw new Error(`The package-lock version "${packageVersion}" does not match the newest version "${version}" of changelog: ${changelog}`);
         }
     }
 
@@ -51,10 +56,63 @@ const validateRelease = async (changelog, branch) => {
         text.includes('breaking change')
             && (previousVersion.value.split('.')[0] === version.split('.')[0])
     ) {
-        throw new Error('This release includes breaking changes, major version should be increased.');
+        throw new Error(`This release includes breaking changes, major version should be increased for changelog: ${changelog}`);
+    }
+};
+
+/**
+ * Compares the current version of the given changelog
+ * with a previous version and validates in case is different.
+ * @param {Compare} param
+ */
+const compareChangelog = async ({
+    octokit,
+    repo,
+    owner,
+    path,
+    base,
+    branch,
+}) => {
+    const previousText = await getFileContent({
+        octokit,
+        repo,
+        owner,
+        path,
+        ref: base,
+    });
+    const currentText = await getFileContent({
+        octokit,
+        repo,
+        owner,
+        path,
+        ref: branch,
+    });
+
+    if (previousText && currentText) {
+        const previousContent = validateChangelog(previousText);
+        const currentContent = validateChangelog(currentText);
+
+        if (
+            !previousContent.isUnreleased &&
+            !currentContent.isUnreleased &&
+            previousContent.version !== currentContent.version
+        ) {
+            validateRelease(path);
+        }
     }
 };
 
 module.exports = {
+    compareChangelog,
     validateRelease,
 };
+
+/**
+ * @typedef {Object} Compare
+ * @prop {Function} octokit
+ * @prop {string} repo
+ * @prop {string} owner
+ * @prop {string} path
+ * @prop {string} branch
+ * @prop {string} base
+ */

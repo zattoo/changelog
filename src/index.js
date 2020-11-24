@@ -9,10 +9,12 @@ const {
     getOctokit,
 } = require('@actions/github');
 
-const {validateRelease} = require('./release');
+const {
+    compareChangelog,
+    validateRelease,
+} = require('./release');
 const {validateChangelog} = require('./validate');
 const {
-    getFileContent,
     getFolders,
     getModifiedFiles,
 } = require('./files');
@@ -30,6 +32,7 @@ const run = async () => {
     const pullNumber = context.payload.pull_request.number;
     const labels = context.payload.pull_request.labels.map((label) => label.name);
     const branch = context.payload.pull_request.head.ref;
+    const base = context.payload.pull_request.base.ref;
 
     try {
         // Ignore the action if -changelog label (or custom name) exists
@@ -46,7 +49,7 @@ const run = async () => {
         });
         const folders = await getFolders(sources);
 
-        for await (const path of folders) {
+        await Promise.all(folders.map(async (path) => {
             const isRoot = path === '';
             const folder = (!path.endsWith('/') && !isRoot) ? `${path}/` : path;
 
@@ -60,59 +63,39 @@ const run = async () => {
 
             const changelogContent = await readFile(`${folder}CHANGELOG.md`, {encoding: 'utf-8'});
             validateChangelog(changelogContent);
-        }
+        }));
 
         // Checks if the branch is release or once of release_branches input.
         if (releaseBranches.find((releaseBranch) => branch.startsWith(releaseBranch))) {
             const changelogs = modifiedFiles.filter((file) => file.endsWith('CHANGELOG.md'));
 
-            /**
-             * If only one changelog is modified
-             * there is no doubt of which one is correct
-             */
-            if (changelogs.length === 1) {
-                validateRelease(changelogs[0], branch);
-            }
-
-            if (changelogs.length > 1) {
+            if (changelogs.length) {
                 /** If branch name contains project ex: release/account */
                 const project = branch.includes('/') && branch.split('/').slice(-1)[0];
 
                 if (project) {
-                    changelogs.filter((file) => file.includes(`${project}/CHANGELOG.md`))
-                        .forEach((file) => validateRelease(file, branch));
-                } else {
-                    /** For each changelog determine if last version is different than production */
-                    for await (const path of changelogs) {
-                        const previousText = await getFileContent({
-                            octokit,
-                            repo,
-                            owner,
-                            path,
-                            ref: 'production',
-                        });
-                        const currentText = await getFileContent({
-                            octokit,
-                            repo,
-                            owner,
-                            path,
-                            ref: branch,
-                        });
+                    const projectChangelog = changelogs.find((file) => file.includes(`${project}/CHANGELOG.md`));
 
-                        if (previousText && currentText) {
-                            const previousContent = validateChangelog(previousText);
-                            const currentContent = validateChangelog(currentText);
-
-                            if (
-                                !previousContent.isUnreleased &&
-                                !currentContent.isUnreleased &&
-                                previousContent.version !== currentContent.version
-                            ) {
-                                validateRelease(path, branch);
-                            }
-                        }
+                    if (projectChangelog) {
+                        validateRelease(projectChangelog);
+                    } else {
+                        throw new Error(`The changelog for project "${project}" must be modified for this release`);
                     }
+                } else {
+                    /** For each changelog determine if last version is different than production and validate it */
+                    await Promise.all(changelogs.map(async (path) => {
+                        await compareChangelog({
+                            octokit,
+                            repo,
+                            owner,
+                            path,
+                            base,
+                            branch,
+                        });
+                    }));
                 }
+            } else {
+                throw new Error('At least one changelog should be modified for a release');
             }
         }
     } catch (error) {

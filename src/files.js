@@ -16,13 +16,13 @@ const getFolders = async (sources) => {
 
     const folders = [];
 
-    for await (const source of sources.split(/, */g)) {
+    await Promise.all(sources.split(/, */g).map(async (source) => {
         if (glob.hasMagic(source)) {
             folders.push(...await globPromise(source.endsWith('/') ? source : `${source}/`));
         } else {
             folders.push(source);
         }
-    }
+    }));
 
     return folders;
 };
