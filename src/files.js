@@ -90,7 +90,7 @@ module.exports = {
 
 /**
  * @typedef {Object} PullRequest
- * @param {function} octokit
+ * @param {object} octokit
  * @param {string} repo
  * @param {string} owner
  * @param {string} path

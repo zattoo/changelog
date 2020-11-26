@@ -111,7 +111,7 @@ module.exports = {
 
 /**
  * @typedef {Object} Compare
- * @prop {Function} octokit
+ * @prop {object} octokit
  * @prop {string} repo
  * @prop {string} owner
  * @prop {string} path
