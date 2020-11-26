@@ -90,9 +90,11 @@ module.exports = {
 
 /**
  * @typedef {Object} PullRequest
- * @param {object} octokit
+ * @param {GithubObject} octokit
  * @param {string} repo
  * @param {string} owner
  * @param {string} path
  * @param {string} [ref]
  */
+
+/** @typedef {import('@actions/github/lib/utils').GitHub} GithubObject */

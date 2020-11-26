@@ -111,10 +111,12 @@ module.exports = {
 
 /**
  * @typedef {Object} Compare
- * @prop {object} octokit
+ * @prop {GithubObject} octokit
  * @prop {string} repo
  * @prop {string} owner
  * @prop {string} path
  * @prop {string} branch
  * @prop {string} base
  */
+
+/** @typedef {import('@actions/github/lib/utils').GitHub} GithubObject */
