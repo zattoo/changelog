@@ -29,11 +29,7 @@ const getFolders = async (sources) => {
 
 /**
  * Returns the modified files in the PR
- * @param {Object} params
- * @param {function} params.octokit
- * @param {string} params.repo
- * @param {string} params.owner
- * @param {number} params.pullNumber
+ * @param {PullRequest} param
  * @returns {Promise<string[]>}
  */
 const getModifiedFiles = async ({
@@ -54,12 +50,7 @@ const getModifiedFiles = async ({
 
 /**
  * Returns the content of a file
- * @param {Object} params
- * @param {function} params.octokit
- * @param {string} params.repo
- * @param {string} params.owner
- * @param {string} params.path
- * @param {string} [params.ref] - Default: the repository’s default
+ * @param {PullRequest} param
  * @returns {Promise<string>}
  */
 const getFileContent = async ({
@@ -93,3 +84,12 @@ module.exports = {
     getModifiedFiles,
     getFileContent,
 };
+
+/**
+* @typedef {Object} PullRequest
+* @param {function} octokit
+* @param {string} repo
+* @param {string} owner
+* @param {string} path
+* @param {string} [ref]
+*/
