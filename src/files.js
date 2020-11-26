@@ -5,6 +5,7 @@ const globPromise = util.promisify(glob);
 
 /**
  * List all folders specified in sources
+ *
  * @param {string} [sources]
  * @returns {Promise<string[]>}
  */
@@ -29,6 +30,7 @@ const getFolders = async (sources) => {
 
 /**
  * Returns the modified files in the PR
+ *
  * @param {PullRequest} param
  * @returns {Promise<string[]>}
  */
@@ -50,6 +52,7 @@ const getModifiedFiles = async ({
 
 /**
  * Returns the content of a file
+ *
  * @param {PullRequest} param
  * @returns {Promise<string>}
  */
@@ -86,10 +89,10 @@ module.exports = {
 };
 
 /**
-* @typedef {Object} PullRequest
-* @param {function} octokit
-* @param {string} repo
-* @param {string} owner
-* @param {string} path
-* @param {string} [ref]
-*/
+ * @typedef {Object} PullRequest
+ * @param {function} octokit
+ * @param {string} repo
+ * @param {string} owner
+ * @param {string} path
+ * @param {string} [ref]
+ */

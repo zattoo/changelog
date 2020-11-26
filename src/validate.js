@@ -13,6 +13,7 @@ const changeTypes = [
  * Obtains the version and date of the given heading
  * Capture Group 1: Version | Unreleased
  * Capture Group 2: Date | Unreleased
+ *
  * @see https://regex101.com/r/v5VmTx/2
  */
 const reH2 = /^##\s\[?(Unreleased)\]?|^##\s\[((?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-(?:(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?:[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)\] - (Unreleased|(?:\d\d?\d?\d?[-/.]\d\d?[-/.]\d\d?\d?\d))$/;
@@ -20,6 +21,7 @@ const reH2 = /^##\s\[?(Unreleased)\]?|^##\s\[((?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?
 /**
  * Validates if the given text heading
  * has invalid spaces
+ *
  * @param {string} text
  * @param {number} level
  * @returns {boolean}
@@ -33,6 +35,7 @@ const checkHeadingSpaces = (text, level) => {
 /**
  * If the semver string a is greater than b, return 1.
  * If the semver string b is greater than a, return -1.
+ *
  * @param {string} a
  * @param {string} b
  * @returns {number}
@@ -54,6 +57,7 @@ const compareSemVer = (a, b) => {
 
 /**
  * Validate if the given date is correct
+ *
  * @param {string} date
  */
 const validateDate = (date) => {
@@ -78,6 +82,7 @@ const isType = (text) => text.match(/^###[ ]{1,}.+/);
 
 /**
  * Check all errors present in the given changelog
+ *
  * @param {string} text
  * @returns {object}
  */

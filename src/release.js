@@ -10,6 +10,7 @@ const {getFileContent} = require('./files');
 /**
  * Given the path of a changelog it will
  * validate if it's a correct release
+ *
  * @param {string} changelog
  */
 const validateRelease = async (changelog) => {
@@ -63,6 +64,7 @@ const validateRelease = async (changelog) => {
 /**
  * Compares the current version of the given changelog
  * with a previous version and validates in case is different.
+ *
  * @param {Compare} param
  */
 const compareChangelog = async ({

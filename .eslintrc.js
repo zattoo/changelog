@@ -6,6 +6,7 @@ module.exports = {
     },
     extends: [
         '@zattoo',
+        '@zattoo/eslint-config/rules/jest',
         '@zattoo/eslint-config/rules/jsdoc',
     ],
     parserOptions: {
