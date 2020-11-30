@@ -4,7 +4,11 @@ module.exports = {
         es2020: true,
         node: true,
     },
-    extends: ['@zattoo'],
+    extends: [
+        '@zattoo',
+        '@zattoo/eslint-config/rules/jest',
+        '@zattoo/eslint-config/rules/jsdoc',
+    ],
     parserOptions: {
         ecmaVersion: 11,
     },
