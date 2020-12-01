@@ -71,7 +71,7 @@ const getFileContent = async ({
             ref,
         });
 
-        return content.data?.content && Buffer.from(content.data.content, 'base64').toString();
+        return content.data.content && Buffer.from(content.data.content, 'base64').toString();
     } catch (error) {
         /**
          * Cases where file does not exists

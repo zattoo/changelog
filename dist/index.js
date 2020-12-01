@@ -387,6 +387,32 @@ module.exports = windowsRelease;
 
 /***/ }),
 
+/***/ 82:
+/***/ (function(__unusedmodule, exports) {
+
+"use strict";
+
+// We use any as a valid input type
+/* eslint-disable @typescript-eslint/no-explicit-any */
+Object.defineProperty(exports, "__esModule", { value: true });
+/**
+ * Sanitizes an input into a string so it can be passed into issueCommand safely
+ * @param input input to sanitize into a string
+ */
+function toCommandValue(input) {
+    if (input === null || input === undefined) {
+        return '';
+    }
+    else if (typeof input === 'string' || input instanceof String) {
+        return input;
+    }
+    return JSON.stringify(input);
+}
+exports.toCommandValue = toCommandValue;
+//# sourceMappingURL=utils.js.map
+
+/***/ }),
+
 /***/ 87:
 /***/ (function(module) {
 
@@ -1321,6 +1347,42 @@ function regExpEscape (s) {
   return s.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')
 }
 
+
+/***/ }),
+
+/***/ 102:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+// For internal use, subject to change.
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+// We use any as a valid input type
+/* eslint-disable @typescript-eslint/no-explicit-any */
+const fs = __importStar(__webpack_require__(747));
+const os = __importStar(__webpack_require__(87));
+const utils_1 = __webpack_require__(82);
+function issueCommand(command, message) {
+    const filePath = process.env[`GITHUB_${command}`];
+    if (!filePath) {
+        throw new Error(`Unable to find environment variable for file command ${command}`);
+    }
+    if (!fs.existsSync(filePath)) {
+        throw new Error(`Missing file at path: ${filePath}`);
+    }
+    fs.appendFileSync(filePath, `${utils_1.toCommandValue(message)}${os.EOL}`, {
+        encoding: 'utf8'
+    });
+}
+exports.issueCommand = issueCommand;
+//# sourceMappingURL=file-command.js.map
 
 /***/ }),
 
@@ -6259,6 +6321,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const os = __importStar(__webpack_require__(87));
+const utils_1 = __webpack_require__(82);
 /**
  * Commands
  *
@@ -6312,28 +6375,14 @@ class Command {
         return cmdStr;
     }
 }
-/**
- * Sanitizes an input into a string so it can be passed into issueCommand safely
- * @param input input to sanitize into a string
- */
-function toCommandValue(input) {
-    if (input === null || input === undefined) {
-        return '';
-    }
-    else if (typeof input === 'string' || input instanceof String) {
-        return input;
-    }
-    return JSON.stringify(input);
-}
-exports.toCommandValue = toCommandValue;
 function escapeData(s) {
-    return toCommandValue(s)
+    return utils_1.toCommandValue(s)
         .replace(/%/g, '%25')
         .replace(/\r/g, '%0D')
         .replace(/\n/g, '%0A');
 }
 function escapeProperty(s) {
-    return toCommandValue(s)
+    return utils_1.toCommandValue(s)
         .replace(/%/g, '%25')
         .replace(/\r/g, '%0D')
         .replace(/\n/g, '%0A')
@@ -8456,6 +8505,8 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const command_1 = __webpack_require__(431);
+const file_command_1 = __webpack_require__(102);
+const utils_1 = __webpack_require__(82);
 const os = __importStar(__webpack_require__(87));
 const path = __importStar(__webpack_require__(622));
 /**
@@ -8482,9 +8533,17 @@ var ExitCode;
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function exportVariable(name, val) {
-    const convertedVal = command_1.toCommandValue(val);
+    const convertedVal = utils_1.toCommandValue(val);
     process.env[name] = convertedVal;
-    command_1.issueCommand('set-env', { name }, convertedVal);
+    const filePath = process.env['GITHUB_ENV'] || '';
+    if (filePath) {
+        const delimiter = '_GitHubActionsFileCommandDelimeter_';
+        const commandValue = `${name}<<${delimiter}${os.EOL}${convertedVal}${os.EOL}${delimiter}`;
+        file_command_1.issueCommand('ENV', commandValue);
+    }
+    else {
+        command_1.issueCommand('set-env', { name }, convertedVal);
+    }
 }
 exports.exportVariable = exportVariable;
 /**
@@ -8500,7 +8559,13 @@ exports.setSecret = setSecret;
  * @param inputPath
  */
 function addPath(inputPath) {
-    command_1.issueCommand('add-path', {}, inputPath);
+    const filePath = process.env['GITHUB_PATH'] || '';
+    if (filePath) {
+        file_command_1.issueCommand('PATH', inputPath);
+    }
+    else {
+        command_1.issueCommand('add-path', {}, inputPath);
+    }
     process.env['PATH'] = `${inputPath}${path.delimiter}${process.env['PATH']}`;
 }
 exports.addPath = addPath;
@@ -9585,6 +9650,7 @@ const changeTypes = [
  * Obtains the version and date of the given heading
  * Capture Group 1: Version | Unreleased
  * Capture Group 2: Date | Unreleased
+ *
  * @see https://regex101.com/r/v5VmTx/2
  */
 const reH2 = /^##\s\[?(Unreleased)\]?|^##\s\[((?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-(?:(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?:[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)\] - (Unreleased|(?:\d\d?\d?\d?[-/.]\d\d?[-/.]\d\d?\d?\d))$/;
@@ -9592,6 +9658,7 @@ const reH2 = /^##\s\[?(Unreleased)\]?|^##\s\[((?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?
 /**
  * Validates if the given text heading
  * has invalid spaces
+ *
  * @param {string} text
  * @param {number} level
  * @returns {boolean}
@@ -9605,6 +9672,7 @@ const checkHeadingSpaces = (text, level) => {
 /**
  * If the semver string a is greater than b, return 1.
  * If the semver string b is greater than a, return -1.
+ *
  * @param {string} a
  * @param {string} b
  * @returns {number}
@@ -9626,6 +9694,7 @@ const compareSemVer = (a, b) => {
 
 /**
  * Validate if the given date is correct
+ *
  * @param {string} date
  */
 const validateDate = (date) => {
@@ -9650,6 +9719,7 @@ const isType = (text) => text.match(/^###[ ]{1,}.+/);
 
 /**
  * Check all errors present in the given changelog
+ *
  * @param {string} text
  * @returns {object}
  */
@@ -10027,6 +10097,135 @@ if (process.platform === 'linux') {
 
 /***/ }),
 
+/***/ 659:
+/***/ (function(module, __unusedexports, __webpack_require__) {
+
+const fs = __webpack_require__(747);
+const util = __webpack_require__(669);
+
+const readFile = util.promisify(fs.readFile);
+const exists = util.promisify(fs.exists);
+
+const {validateChangelog} = __webpack_require__(601);
+const {getFileContent} = __webpack_require__(688);
+
+/**
+ * Given the path of a changelog it will
+ * validate if it's a correct release
+ *
+ * @param {string} changelog
+ */
+const validateRelease = async (changelog) => {
+    const folder = changelog.replace('CHANGELOG.md', '');
+
+    const changelogContent = await readFile(changelog, {encoding: 'utf-8'});
+
+    const {
+        isUnreleased,
+        version,
+        date,
+        skeleton,
+    } = validateChangelog(changelogContent);
+
+    if (isUnreleased) {
+        throw new Error(`A release branch can't have "Unreleased" version for changelog: ${changelog}`);
+    }
+
+    if (!version || version === 'Unreleased') {
+        throw new Error(`A release branch should have a version for changelog ${changelog}`);
+    }
+
+    if (!date) {
+        throw new Error(`A release branch should have a date for changelog: ${changelog}`);
+    }
+
+    const {version: packageVersion} = JSON.parse(await readFile(`${folder}package.json`, {encoding: 'utf-8'}));
+    if (packageVersion !== version) {
+        throw new Error(`The package version "${packageVersion}" does not match the newest version "${version}" of changelog: ${changelog}`);
+    }
+
+    if (await exists(`${folder}package-lock.json`)) {
+        const {version: packageLockVersion} = JSON.parse(await readFile(`${folder}package-lock.json`, {encoding: 'utf-8'}));
+        if (packageLockVersion !== version) {
+            throw new Error(`The package-lock version "${packageVersion}" does not match the newest version "${version}" of changelog: ${changelog}`);
+        }
+    }
+
+    // Validate if branch contains breaking changes
+    // and version has the same major version as previous.
+    const text = skeleton.versionText[version].map((v) => v.value).join();
+    const previousVersion = skeleton.versions[1];
+    if (
+        text.includes('breaking change')
+            && (previousVersion.value.split('.')[0] === version.split('.')[0])
+    ) {
+        throw new Error(`This release includes breaking changes, major version should be increased for changelog: ${changelog}`);
+    }
+};
+
+/**
+ * Compares the current version of the given changelog
+ * with a previous version and validates in case is different.
+ *
+ * @param {Compare} param
+ */
+const compareChangelog = async ({
+    octokit,
+    repo,
+    owner,
+    path,
+    base,
+    branch,
+}) => {
+    const previousText = await getFileContent({
+        octokit,
+        repo,
+        owner,
+        path,
+        ref: base,
+    });
+    const currentText = await getFileContent({
+        octokit,
+        repo,
+        owner,
+        path,
+        ref: branch,
+    });
+
+    if (previousText && currentText) {
+        const previousContent = validateChangelog(previousText);
+        const currentContent = validateChangelog(currentText);
+
+        if (
+            !previousContent.isUnreleased &&
+            !currentContent.isUnreleased &&
+            previousContent.version !== currentContent.version
+        ) {
+            validateRelease(path);
+        }
+    }
+};
+
+module.exports = {
+    compareChangelog,
+    validateRelease,
+};
+
+/**
+ * @typedef {Object} Compare
+ * @prop {GithubObject} octokit
+ * @prop {string} repo
+ * @prop {string} owner
+ * @prop {string} path
+ * @prop {string} branch
+ * @prop {string} base
+ */
+
+/** @typedef {import('@actions/github/lib/utils').GitHub} GithubObject */
+
+
+/***/ }),
+
 /***/ 669:
 /***/ (function(module) {
 
@@ -10103,17 +10302,20 @@ const core = __webpack_require__(470);
 const util = __webpack_require__(669);
 
 const readFile = util.promisify(fs.readFile);
-const stat = util.promisify(fs.stat);
 
 const {
     context,
     getOctokit,
 } = __webpack_require__(469);
 
+const {
+    compareChangelog,
+    validateRelease,
+} = __webpack_require__(659);
 const {validateChangelog} = __webpack_require__(601);
 const {
-    getModifiedFiles,
     getFolders,
+    getModifiedFiles,
 } = __webpack_require__(688);
 
 const run = async () => {
@@ -10129,6 +10331,7 @@ const run = async () => {
     const pullNumber = context.payload.pull_request.number;
     const labels = context.payload.pull_request.labels.map((label) => label.name);
     const branch = context.payload.pull_request.head.ref;
+    const base = context.payload.pull_request.base.ref;
 
     try {
         // Ignore the action if -changelog label (or custom name) exists
@@ -10137,10 +10340,15 @@ const run = async () => {
             process.exit(0);
         }
 
-        const modifiedFiles = await getModifiedFiles(octokit, repo, owner, pullNumber);
+        const modifiedFiles = await getModifiedFiles({
+            octokit,
+            repo,
+            owner,
+            pullNumber,
+        });
         const folders = await getFolders(sources);
 
-        for await (const path of folders) {
+        await Promise.all(folders.map(async (path) => {
             const isRoot = path === '';
             const folder = (!path.endsWith('/') && !isRoot) ? `${path}/` : path;
 
@@ -10153,53 +10361,40 @@ const run = async () => {
             }
 
             const changelogContent = await readFile(`${folder}CHANGELOG.md`, {encoding: 'utf-8'});
-            const {
-                isUnreleased,
-                version,
-                date,
-                skeleton,
-            } = validateChangelog(changelogContent);
+            validateChangelog(changelogContent);
+        }));
 
-            // Checks if the branch is release or once of release_branches input.
-            if (releaseBranches.find((releaseBranch) => branch.startsWith(releaseBranch))) {
-                if (isUnreleased) {
-                    throw new Error(`"${branch}" branch can't be unreleased`);
-                }
+        // Checks if the branch is release or once of release_branches input.
+        if (releaseBranches.find((releaseBranch) => branch.startsWith(releaseBranch))) {
+            const changelogs = modifiedFiles.filter((file) => file.endsWith('CHANGELOG.md'));
 
-                if (!version || version === 'Unreleased') {
-                    throw new Error(`"${branch}" branch should have a version`);
-                }
+            if (changelogs.length) {
+                /** If branch name contains project ex: release/account */
+                const project = branch.includes('/') && branch.split('/').slice(-1)[0];
 
-                if (!date) {
-                    throw new Error(`"${branch}" branch should have a date`);
-                }
+                if (project) {
+                    const projectChangelog = changelogs.find((file) => file.includes(`${project}/CHANGELOG.md`));
 
-                const {version: packageVersion} = JSON.parse(await readFile(`${folder}package.json`, {encoding: 'utf-8'}));
-                if (packageVersion !== version) {
-                    throw new Error(`The package version "${packageVersion}" does not match the newest version "${version}"`);
-                }
-
-                const packageLockStats = await stat(`${folder}package-lock.json`);
-
-                if (packageLockStats) {
-                    const {version: packageLockVersion} = JSON.parse(await readFile(`${folder}package-lock.json`, {encoding: 'utf-8'}));
-                    if (packageLockVersion !== version) {
-                        throw new Error(`The package-lock version "${packageVersion}" does not match the newest version "${version}"`);
+                    if (projectChangelog) {
+                        validateRelease(projectChangelog);
+                    } else {
+                        throw new Error(`The changelog for project "${project}" must be modified for this release`);
                     }
+                } else {
+                    /** For each changelog determine if last version is different than production and validate it */
+                    await Promise.all(changelogs.map(async (path) => {
+                        await compareChangelog({
+                            octokit,
+                            repo,
+                            owner,
+                            path,
+                            base,
+                            branch,
+                        });
+                    }));
                 }
-
-                // Validate if branch contains breaking changes
-                // and version has the same major version as previous.
-                if (branch.startsWith('release')) {
-                    const text = skeleton.versionText[version].map((v) => v.value).join();
-                    const previousVersion = skeleton.versions[1];
-                    if (
-                        text.includes('breaking change')
-                        && (previousVersion.value.split('.')[0] === version.split('.')[0])
-                    ) {
-                        throw new Error('This release includes breaking changes, major version should be increased.');
-                    }
-                }
+            } else {
+                throw new Error('At least one changelog should be modified for a release');
             }
         }
     } catch (error) {
@@ -10250,6 +10445,7 @@ const globPromise = util.promisify(glob);
 
 /**
  * List all folders specified in sources
+ *
  * @param {string} [sources]
  * @returns {Promise<string[]>}
  */
@@ -10261,25 +10457,29 @@ const getFolders = async (sources) => {
 
     const folders = [];
 
-    for await (const source of sources.split(/, */g)) {
+    await Promise.all(sources.split(/, */g).map(async (source) => {
         if (glob.hasMagic(source)) {
             folders.push(...await globPromise(source.endsWith('/') ? source : `${source}/`));
         } else {
             folders.push(source);
         }
-    }
+    }));
 
     return folders;
 };
 
 /**
  * Returns the modified files in the PR
- * @param {function} octokit
- * @param {string} repo
- * @param {string} owner
- * @param {number} pullNumber
+ *
+ * @param {PullRequest} param
+ * @returns {Promise<string[]>}
  */
-const getModifiedFiles = async (octokit, repo, owner, pullNumber) => {
+const getModifiedFiles = async ({
+    octokit,
+    repo,
+    owner,
+    pullNumber,
+}) => {
     const files = await octokit.pulls.listFiles({
         owner,
         repo,
@@ -10290,10 +10490,54 @@ const getModifiedFiles = async (octokit, repo, owner, pullNumber) => {
     return files.data.map((file) => file.filename);
 };
 
+/**
+ * Returns the content of a file
+ *
+ * @param {PullRequest} param
+ * @returns {Promise<string>}
+ */
+const getFileContent = async ({
+    octokit,
+    repo,
+    owner,
+    path,
+    ref,
+}) => {
+    try {
+        const content = await octokit.repos.getContent({
+            owner,
+            repo,
+            path,
+            ref,
+        });
+
+        return content.data.content && Buffer.from(content.data.content, 'base64').toString();
+    } catch (error) {
+        /**
+         * Cases where file does not exists
+         * should not stop execution
+         */
+        console.log(error.message);
+        return null;
+    }
+};
+
 module.exports = {
     getFolders,
     getModifiedFiles,
+    getFileContent,
 };
+
+/**
+ * @typedef {Object} PullRequest
+ * @param {GithubObject} octokit
+ * @param {string} repo
+ * @param {string} owner
+ * @param {string} path
+ * @param {string} [ref]
+ */
+
+/** @typedef {import('@actions/github/lib/utils').GitHub} GithubObject */
 
 
 /***/ }),
