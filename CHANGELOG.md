@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 
+## [1.6.0] - 01.12.2020
+
+Added multiple changelogs support
+
 ## [1.5.0] - 07.10.2020
 
 ### Added

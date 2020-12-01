@@ -3,17 +3,20 @@ const core = require('@actions/core');
 const util = require('util');
 
 const readFile = util.promisify(fs.readFile);
-const stat = util.promisify(fs.stat);
 
 const {
     context,
     getOctokit,
 } = require('@actions/github');
 
+const {
+    compareChangelog,
+    validateRelease,
+} = require('./release');
 const {validateChangelog} = require('./validate');
 const {
-    getModifiedFiles,
     getFolders,
+    getModifiedFiles,
 } = require('./files');
 
 const run = async () => {
@@ -29,6 +32,7 @@ const run = async () => {
     const pullNumber = context.payload.pull_request.number;
     const labels = context.payload.pull_request.labels.map((label) => label.name);
     const branch = context.payload.pull_request.head.ref;
+    const base = context.payload.pull_request.base.ref;
 
     try {
         // Ignore the action if -changelog label (or custom name) exists
@@ -37,10 +41,15 @@ const run = async () => {
             process.exit(0);
         }
 
-        const modifiedFiles = await getModifiedFiles(octokit, repo, owner, pullNumber);
+        const modifiedFiles = await getModifiedFiles({
+            octokit,
+            repo,
+            owner,
+            pullNumber,
+        });
         const folders = await getFolders(sources);
 
-        for await (const path of folders) {
+        await Promise.all(folders.map(async (path) => {
             const isRoot = path === '';
             const folder = (!path.endsWith('/') && !isRoot) ? `${path}/` : path;
 
@@ -53,53 +62,40 @@ const run = async () => {
             }
 
             const changelogContent = await readFile(`${folder}CHANGELOG.md`, {encoding: 'utf-8'});
-            const {
-                isUnreleased,
-                version,
-                date,
-                skeleton,
-            } = validateChangelog(changelogContent);
+            validateChangelog(changelogContent);
+        }));
 
-            // Checks if the branch is release or once of release_branches input.
-            if (releaseBranches.find((releaseBranch) => branch.startsWith(releaseBranch))) {
-                if (isUnreleased) {
-                    throw new Error(`"${branch}" branch can't be unreleased`);
-                }
+        // Checks if the branch is release or once of release_branches input.
+        if (releaseBranches.find((releaseBranch) => branch.startsWith(releaseBranch))) {
+            const changelogs = modifiedFiles.filter((file) => file.endsWith('CHANGELOG.md'));
 
-                if (!version || version === 'Unreleased') {
-                    throw new Error(`"${branch}" branch should have a version`);
-                }
+            if (changelogs.length) {
+                /** If branch name contains project ex: release/account */
+                const project = branch.includes('/') && branch.split('/').slice(-1)[0];
 
-                if (!date) {
-                    throw new Error(`"${branch}" branch should have a date`);
-                }
+                if (project) {
+                    const projectChangelog = changelogs.find((file) => file.includes(`${project}/CHANGELOG.md`));
 
-                const {version: packageVersion} = JSON.parse(await readFile(`${folder}package.json`, {encoding: 'utf-8'}));
-                if (packageVersion !== version) {
-                    throw new Error(`The package version "${packageVersion}" does not match the newest version "${version}"`);
-                }
-
-                const packageLockStats = await stat(`${folder}package-lock.json`);
-
-                if (packageLockStats) {
-                    const {version: packageLockVersion} = JSON.parse(await readFile(`${folder}package-lock.json`, {encoding: 'utf-8'}));
-                    if (packageLockVersion !== version) {
-                        throw new Error(`The package-lock version "${packageVersion}" does not match the newest version "${version}"`);
+                    if (projectChangelog) {
+                        validateRelease(projectChangelog);
+                    } else {
+                        throw new Error(`The changelog for project "${project}" must be modified for this release`);
                     }
+                } else {
+                    /** For each changelog determine if last version is different than production and validate it */
+                    await Promise.all(changelogs.map(async (path) => {
+                        await compareChangelog({
+                            octokit,
+                            repo,
+                            owner,
+                            path,
+                            base,
+                            branch,
+                        });
+                    }));
                 }
-
-                // Validate if branch contains breaking changes
-                // and version has the same major version as previous.
-                if (branch.startsWith('release')) {
-                    const text = skeleton.versionText[version].map((v) => v.value).join();
-                    const previousVersion = skeleton.versions[1];
-                    if (
-                        text.includes('breaking change')
-                        && (previousVersion.value.split('.')[0] === version.split('.')[0])
-                    ) {
-                        throw new Error('This release includes breaking changes, major version should be increased.');
-                    }
-                }
+            } else {
+                throw new Error('At least one changelog should be modified for a release');
             }
         }
     } catch (error) {
