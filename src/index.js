@@ -77,7 +77,7 @@ const run = async () => {
                     const projectChangelog = changelogs.find((file) => file.includes(`${project}/CHANGELOG.md`));
 
                     if (projectChangelog) {
-                        validateRelease(projectChangelog);
+                        await validateRelease(projectChangelog);
                     } else {
                         throw new Error(`The changelog for project "${project}" must be modified for this release`);
                     }
