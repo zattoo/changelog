@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 
+## Unreleased
+
+### Infrastructure
+- Added `v1` back-syncs
+
 ## [1.6.0] - 01.12.2020
 
 Added multiple changelogs support
