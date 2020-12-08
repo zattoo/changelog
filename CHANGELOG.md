@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 
 ## [1.6.2] - 08.12.2020
 
-## Fixed
+### Fixed
 - undefined repeated headings
 - longer semantic versions
 
