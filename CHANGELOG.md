@@ -3,6 +3,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 
+## [1.6.2] - 08.12.2020
+
+## Fixed
+- undefined repeated headings
+- longer semantic versions
+
 ## [1.6.1] - 02.12.2020
 
 Fixed errors not throwing
