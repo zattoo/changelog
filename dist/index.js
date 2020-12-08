@@ -9908,7 +9908,10 @@ const validateChangelog = (text) => {
         if (skeleton.versions[i - 1]
             && skeleton.versions[i - 1].value !== 'Unreleased'
             && skeleton.versions[i - 1].value !== undefined
-            && compareSemVer(skeleton.versions[i - 1].value, version.value) === -1) {
+            && compareSemVer(
+                skeleton.versions[i - 1].value.replace('-', '.'),
+                version.value.replace('-', '.'),
+            ) === -1) {
             errors.push({
                 message: 'Previous version can\'t be smaller than the next one',
                 lines: [skeleton.versions[i - 1].lineNumber, version.lineNumber],
@@ -9918,12 +9921,14 @@ const validateChangelog = (text) => {
 
     // Check duplicated headings for version
     Object.entries(skeleton.versionsContent).forEach(([version, headings]) => {
-        const unrepeatedHeadings = new Set(headings.map((heading) => heading.value));
-        if (unrepeatedHeadings.size !== headings.length) {
-            errors.push({
-                message: `Version "${version}" can't have repeated headings`,
-                lines: [skeleton.versions.find((v) => v.value === version).lineNumber],
-            });
+        if (version) {
+            const unrepeatedHeadings = new Set(headings.map((heading) => heading.value));
+            if (unrepeatedHeadings.size !== headings.length) {
+                errors.push({
+                    message: `Version "${version}" can't have repeated headings`,
+                    lines: [skeleton.versions.find((v) => v.value === version).lineNumber],
+                });
+            }
         }
     });
 
