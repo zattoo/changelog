@@ -10300,6 +10300,7 @@ function slice (args) {
 const fs = __webpack_require__(747);
 const core = __webpack_require__(470);
 const util = __webpack_require__(669);
+const wcmatch = __webpack_require__(724);
 
 const readFile = util.promisify(fs.readFile);
 
@@ -10322,6 +10323,7 @@ const run = async () => {
     const token = core.getInput('token', {required: true});
     const octokit = getOctokit(token);
     const sources = core.getInput('sources', {required: false});
+    const exclude = core.getInput('exclude', {required: false});
     const releaseBranchesInput = core.getInput('release_branches', {required: false});
     const releaseBranches = (releaseBranchesInput && releaseBranchesInput.split(/, */g)) || ['release'];
     const ignoreActionLabel = core.getInput('ignoreActionLabel');
@@ -10340,12 +10342,16 @@ const run = async () => {
             process.exit(0);
         }
 
+        const isExcluded = wcmatch(exclude ? exclude.split(',')
+            .map((name) => name.trim()) : []);
+
         const modifiedFiles = await getModifiedFiles({
             octokit,
             repo,
             owner,
             pullNumber,
-        });
+        }).filter((file) => !isExcluded(file));
+
         const folders = await getFolders(sources);
 
         await Promise.all(folders.map(async (path) => {
@@ -10661,6 +10667,167 @@ module.exports = (promise, onFinally) => {
 		})
 	);
 };
+
+
+/***/ }),
+
+/***/ 724:
+/***/ (function(module) {
+
+"use strict";
+
+
+function escapeRegExpChar(char) { if (char === '-' ||
+    char === '^' ||
+    char === '$' ||
+    char === '+' ||
+    char === '.' ||
+    char === '(' ||
+    char === ')' ||
+    char === '|' ||
+    char === '[' ||
+    char === ']' ||
+    char === '{' ||
+    char === '}' ||
+    char === '*' ||
+    char === '?' ||
+    char === '\\') {
+    return "\\" + char;
+}
+else {
+    return char;
+} }
+function escapeRegExpString(str) {
+    var result = '';
+    for (var i = 0; i < str.length; i++) {
+        result += escapeRegExpChar(str[i]);
+    }
+    return result;
+}
+function compile(pattern, options) {
+    if (Array.isArray(pattern)) {
+        var regExpPatterns = pattern.map(function (p) { return "^" + compile(p, options) + "$"; });
+        return "(?:" + regExpPatterns.join('|') + ")";
+    }
+    var separator = typeof options.separator === 'undefined' ? true : options.separator;
+    var separatorSplitter = '';
+    var separatorMatcher = '';
+    var wildcard = '.';
+    if (separator === true) {
+        separatorSplitter = '/';
+        separatorMatcher = '[/\\\\]';
+        wildcard = '[^/\\\\]';
+    }
+    else if (separator) {
+        separatorSplitter = separator;
+        separatorMatcher = escapeRegExpString(separatorSplitter);
+        if (separatorMatcher.length > 1) {
+            separatorMatcher = "(?:" + separatorMatcher + ")";
+            wildcard = "((?!" + separatorMatcher + ").)";
+        }
+        else {
+            wildcard = "[^" + separatorMatcher + "]";
+        }
+    }
+    else {
+        wildcard = '.';
+    }
+    var requiredSeparator = separator ? separatorMatcher + "+?" : '';
+    var optionalSeparator = separator ? separatorMatcher + "*?" : '';
+    var segments = separator ? pattern.split(separatorSplitter) : [pattern];
+    var result = '';
+    for (var s = 0; s < segments.length; s++) {
+        var segment = segments[s];
+        var nextSegment = segments[s + 1];
+        var currentSeparator = '';
+        if (!segment && s > 0) {
+            continue;
+        }
+        if (separator) {
+            if (s === segments.length - 1) {
+                currentSeparator = optionalSeparator;
+            }
+            else if (nextSegment !== '**') {
+                currentSeparator = requiredSeparator;
+            }
+            else {
+                currentSeparator = '';
+            }
+        }
+        if (separator && segment === '**') {
+            if (currentSeparator) {
+                result += s === 0 ? '' : currentSeparator;
+                result += "(?:" + wildcard + "*?" + currentSeparator + ")*?";
+            }
+            continue;
+        }
+        for (var c = 0; c < segment.length; c++) {
+            var char = segment[c];
+            if (char === '\\') {
+                if (c < segment.length - 1) {
+                    result += escapeRegExpChar(segment[c + 1]);
+                    c++;
+                }
+            }
+            else if (char === '?') {
+                result += wildcard;
+            }
+            else if (char === '*') {
+                result += wildcard + "*?";
+            }
+            else {
+                result += escapeRegExpChar(char);
+            }
+        }
+        result += currentSeparator;
+    }
+    return result;
+}
+function isMatch(regexp, sample) { if (typeof sample !== 'string') {
+    throw new TypeError("Sample must be a string, but " + typeof sample + " given");
+} return regexp.test(sample); }
+/**
+ * Compiles one or more glob patterns into a RegExp and returns an isMatch function.
+ * The isMatch function takes a sample string as its only argument and returns true
+ * if the string matches the pattern(s).
+ *
+ * ```js
+ * wildcardMatch('src/*.js')('src/index.js') //=> true
+ * ```
+ *
+ * ```js
+ * const isMatch = wildcardMatch('*.example.com', '.')
+ * isMatch('foo.example.com') //=> true
+ * isMatch('foo.bar.com') //=> false
+ * ```
+ */
+function wildcardMatch(pattern, options) {
+    if (typeof pattern !== 'string' && !Array.isArray(pattern)) {
+        throw new TypeError("The first argument must be a single pattern string or an array of patterns, but " + typeof pattern + " given");
+    }
+    if (typeof options === 'string' || typeof options === 'boolean') {
+        options = { separator: options };
+    }
+    if (arguments.length === 2 &&
+        !(typeof options === 'undefined' ||
+            (typeof options === 'object' && options !== null && !Array.isArray(options)))) {
+        throw new TypeError("The second argument must be an options object or a string/boolean separator, but " + typeof options + " given");
+    }
+    options = options || {};
+    if (options.separator === '\\') {
+        throw new Error('\\ is not a valid separator');
+    }
+    var regexpPattern = compile(pattern, options);
+    var regexp = new RegExp("^" + regexpPattern + "$", options.flags);
+    var fn = isMatch.bind(null, regexp);
+    fn.options = options;
+    fn.pattern = pattern;
+    fn.regexp = regexp;
+    return fn;
+}
+
+module.exports = wildcardMatch;
+//# sourceMappingURL=index.js.map
 
 
 /***/ }),
