@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 
 ## Unreleased
 
+### Added
+- [51](https://github.com/zattoo/changelog/issues/51) Ignore files
+
 ### Infrastructure
 - Added `v1` back-syncs
 
