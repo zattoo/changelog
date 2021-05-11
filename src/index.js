@@ -1,6 +1,7 @@
 const fs = require('fs');
 const core = require('@actions/core');
 const util = require('util');
+const wcmatch = require('wildcard-match');
 
 const readFile = util.promisify(fs.readFile);
 
@@ -23,6 +24,7 @@ const run = async () => {
     const token = core.getInput('token', {required: true});
     const octokit = getOctokit(token);
     const sources = core.getInput('sources', {required: false});
+    const exclude = core.getInput('exclude', {required: false});
     const releaseBranchesInput = core.getInput('release_branches', {required: false});
     const releaseBranches = (releaseBranchesInput && releaseBranchesInput.split(/, */g)) || ['release'];
     const ignoreActionLabel = core.getInput('ignoreActionLabel');
@@ -41,12 +43,16 @@ const run = async () => {
             process.exit(0);
         }
 
+        const isExcluded = wcmatch(exclude ? exclude.split(',')
+            .map((name) => name.trim()) : []);
+
         const modifiedFiles = await getModifiedFiles({
             octokit,
             repo,
             owner,
             pullNumber,
-        });
+        }).filter((file) => !isExcluded(file));
+
         const folders = await getFolders(sources);
 
         await Promise.all(folders.map(async (path) => {
