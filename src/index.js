@@ -46,12 +46,12 @@ const run = async () => {
         const isExcluded = wcmatch(exclude ? exclude.split(',')
             .map((name) => name.trim()) : []);
 
-        const modifiedFiles = await getModifiedFiles({
+        const modifiedFiles = (await getModifiedFiles({
             octokit,
             repo,
             owner,
             pullNumber,
-        }).filter((file) => !isExcluded(file));
+        })).filter((file) => !isExcluded(file));
 
         const folders = await getFolders(sources);
 
