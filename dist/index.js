@@ -9670,6 +9670,18 @@ const checkHeadingSpaces = (text, level) => {
 };
 
 /**
+ * Checks if the given version is not released yet
+ *
+ * @param {string} version
+ * @returns {boolean}
+ */
+const isPrerelease = (version) => {
+    const lowerCasedVersion = version.toLowerCase();
+    const preReleases = ['alpha', 'rc', 'beta', 'dev'];
+    return preReleases.some((name) => lowerCasedVersion.includes(name));
+};
+
+/**
  * If the semver string a is greater than b, return 1.
  * If the semver string b is greater than a, return -1.
  *
@@ -9888,6 +9900,15 @@ const validateChangelog = (text) => {
         });
     }
 
+    // Check if unreleased version is the first heading if present
+    const unreleasedIndex = skeleton.versions.findIndex((version) => version.value.toLowerCase().includes('unreleased'));
+    if (unreleasedIndex > 0) {
+        errors.push({
+            message: 'Unreleased version must be the fist version heading',
+            lines: [skeleton.versions[unreleasedIndex].lineNumber],
+        });
+    }
+
     // Check repeated versions
     const repeatedCounts = skeleton.versions.reduce((acc, version) => {
         acc[version.value] = ++acc[version.value] || 0;
@@ -9908,7 +9929,8 @@ const validateChangelog = (text) => {
         if (skeleton.versions[i - 1]
             && skeleton.versions[i - 1].value !== 'Unreleased'
             && skeleton.versions[i - 1].value !== undefined
-            && compareSemVer(skeleton.versions[i - 1].value, version.value) === -1) {
+            && compareSemVer(skeleton.versions[i - 1].value, version.value) === -1
+            && !isPrerelease(version.value)) {
             errors.push({
                 message: 'Previous version can\'t be smaller than the next one',
                 lines: [skeleton.versions[i - 1].lineNumber, version.lineNumber],
