@@ -69,6 +69,38 @@ describe('validateChangelog', () => {
         const nextVersionGreaterThanPrevious = await readFile('./src/__test__/changelogs/emptyLines.md', {encoding: 'utf-8'});
         expect(() => validateChangelog(nextVersionGreaterThanPrevious)).toThrow('A version heading needs an empty line after');
     });
+
+    /**
+     * Release tests
+     *
+     * @see https://github.com/zattoo/changelog/issues/37
+     */
+    it('should throw error if wrong version was patched', async () => {
+        const nextVersionGreaterThanPrevious = await readFile('./src/__test__/changelogs/release/wrongVersionWasPatched.md', {encoding: 'utf-8'});
+        expect(() => validateChangelog(nextVersionGreaterThanPrevious)).toThrow('Previous version can\'t be smaller than the next one');
+    });
+
+    it('should throw error if version was added in wrong timeline', async () => {
+        const nextVersionGreaterThanPrevious = await readFile('./src/__test__/changelogs/release/versionWasAddedInWrongTimeline.md', {encoding: 'utf-8'});
+        expect(() => validateChangelog(nextVersionGreaterThanPrevious)).toThrow('Previous version can\'t be smaller than the next one');
+    });
+
+    it('should throw error if unreleased version placed between released versions', async () => {
+        const nextVersionGreaterThanPrevious = await readFile('./src/__test__/changelogs/release/unreleasedVersionPlacedBetweenReleasedVersions.md', {encoding: 'utf-8'});
+        expect(() => validateChangelog(nextVersionGreaterThanPrevious)).toThrow('Unreleased version must be the fist version heading');
+    });
+
+    it('should throw error if merge conflict added by mistake in same versions', async () => {
+        const nextVersionGreaterThanPrevious = await readFile('./src/__test__/changelogs/release/mergeConflictAddedByMistakeSameVersions.md', {encoding: 'utf-8'});
+        expect(() => validateChangelog(nextVersionGreaterThanPrevious)).toThrow('Version repeated on lines');
+    });
+
+    it('should be valid if pre-release has greater version', async () => {
+        const changelogContent = await readFile('./src/__test__/changelogs/release/ifPreReleaseHasGreaterVersion.md', {encoding: 'utf-8'});
+        const {skeleton} = validateChangelog(changelogContent);
+        expect(skeleton.versions[0].value).toBe('2.2.0');
+        expect(skeleton.versions[1].value).toBe('3.0.0-rc.0');
+    });
 });
 
 describe('compareSemVer', () => {
