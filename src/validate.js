@@ -34,6 +34,9 @@ const checkHeadingSpaces = (text, level) => {
 
 /**
  * Checks if the given version is not released yet
+ *
+ * @param {string} version
+ * @returns {boolean}
  */
 const isPrerelease = (version) => {
     const lowerCasedVersion = version.toLowerCase();
