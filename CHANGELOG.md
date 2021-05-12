@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 ### Added
 - [51](https://github.com/zattoo/changelog/issues/51) Ignore files
 - [37](https://github.com/zattoo/changelog/issues/37) Supported alpha version order and `Unreleased` check as first heading
+- [49](https://github.com/zattoo/changelog/issues/49) Limited release branch to ask for modified files only of its own project
 
 ### Infrastructure
 - Added `v1` back-syncs
