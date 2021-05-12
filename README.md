@@ -44,6 +44,13 @@ Required. GitHub token
 Optional. String with folders to watch separated by commas
 Example : 'projects/app/, projects/embed/, projects/account/'
 
+### `exclude`
+
+`array of strings`
+
+Optional. String with folders or files to exclude from watch
+Example : '.eslintrc, packages/**'
+
 ### `release_branches`
 
 `array of strings`
