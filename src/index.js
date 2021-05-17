@@ -70,8 +70,12 @@ const run = async () => {
 
             // Check if at least one file was modified in the watchFolder
             if (isRoot || modifiedFiles.some((filename) => filename.startsWith(folder))) {
-                // Check if changelog is in the modified files
-                if (!modifiedFiles.includes(`${folder}CHANGELOG.md`)) {
+                /**
+                 * Check if changelog is in the modified files
+                 * when is not a release branch or
+                 * is a release branch with a project
+                 */
+                if (((isReleaseBranch && project) || !isReleaseBranch) && !modifiedFiles.includes(`${folder}CHANGELOG.md`)) {
                     throw new Error(`Files in "${isRoot ? 'root' : folder}" have been modified but "${folder}CHANGELOG.md" was not modified`);
                 }
             }
