@@ -88,8 +88,8 @@ const run = async () => {
             const changelogs = modifiedFiles.filter((file) => file.endsWith('CHANGELOG.md'));
 
             if (changelogs.length) {
-                if (project) {
-                    const projectChangelog = changelogs.find((file) => file.includes(`${project}/CHANGELOG.md`));
+                if ((changelogs.length === 1 && !project) || project) {
+                    const projectChangelog = project ? changelogs.find((file) => file.includes(`${project}/CHANGELOG.md`)) : changelogs[0];
 
                     if (projectChangelog) {
                         await validateRelease(projectChangelog);
