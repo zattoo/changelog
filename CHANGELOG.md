@@ -5,7 +5,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 
 
 ## [1.7.0] - 11.06.2021
-
 ### Added
 - [51](https://github.com/zattoo/changelog/issues/51) Ignore files
 - [37](https://github.com/zattoo/changelog/issues/37) Supported alpha version order and `Unreleased` check as first heading
