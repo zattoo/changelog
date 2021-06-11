@@ -10364,15 +10364,24 @@ const run = async () => {
             process.exit(0);
         }
 
+        const [branchName, project] = branch.split('/');
+        const isReleaseBranch = releaseBranches.find((releaseBranch) => branchName.startsWith(releaseBranch));
+
         const isExcluded = wcmatch(exclude ? exclude.split(',')
             .map((name) => name.trim()) : []);
 
-        const modifiedFiles = (await getModifiedFiles({
+        let modifiedFiles = (await getModifiedFiles({
             octokit,
             repo,
             owner,
             pullNumber,
         })).filter((file) => !isExcluded(file));
+
+        // Limits modified files to the ones in the project folder of the release
+        if (isReleaseBranch && project) {
+            const isInAppFolder = wcmatch([`projects/${project}/**`, `packages/${project}/**`]);
+            modifiedFiles = modifiedFiles.filter((file) => isInAppFolder(file));
+        }
 
         const folders = await getFolders(sources);
 
@@ -10382,8 +10391,12 @@ const run = async () => {
 
             // Check if at least one file was modified in the watchFolder
             if (isRoot || modifiedFiles.some((filename) => filename.startsWith(folder))) {
-                // Check if changelog is in the modified files
-                if (!modifiedFiles.includes(`${folder}CHANGELOG.md`)) {
+                /**
+                 * Check if changelog is in the modified files
+                 * when is not a release branch or
+                 * is a release branch with a project
+                 */
+                if (((isReleaseBranch && project) || !isReleaseBranch) && !modifiedFiles.includes(`${folder}CHANGELOG.md`)) {
                     throw new Error(`Files in "${isRoot ? 'root' : folder}" have been modified but "${folder}CHANGELOG.md" was not modified`);
                 }
             }
@@ -10392,16 +10405,12 @@ const run = async () => {
             validateChangelog(changelogContent);
         }));
 
-        // Checks if the branch is release or once of release_branches input.
-        if (releaseBranches.find((releaseBranch) => branch.startsWith(releaseBranch))) {
+        if (isReleaseBranch) {
             const changelogs = modifiedFiles.filter((file) => file.endsWith('CHANGELOG.md'));
 
             if (changelogs.length) {
-                /** If branch name contains project ex: release/account */
-                const project = branch.includes('/') && branch.split('/').slice(-1)[0];
-
-                if (project) {
-                    const projectChangelog = changelogs.find((file) => file.includes(`${project}/CHANGELOG.md`));
+                if ((changelogs.length === 1 && !project) || project) {
+                    const projectChangelog = project ? changelogs.find((file) => file.includes(`${project}/CHANGELOG.md`)) : changelogs[0];
 
                     if (projectChangelog) {
                         await validateRelease(projectChangelog);
