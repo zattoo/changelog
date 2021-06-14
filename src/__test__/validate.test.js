@@ -115,7 +115,7 @@ describe('compareSemVer', () => {
     });
 
     it('should indicate that a is equal to a', () => {
-        expect(compareSemVer(a, a)).toEqual(undefined);
+        expect(compareSemVer(a, a)).toEqual(0);
     });
 });
 

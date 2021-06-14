@@ -47,6 +47,7 @@ const isPrerelease = (version) => {
 /**
  * If the semver string a is greater than b, return 1.
  * If the semver string b is greater than a, return -1.
+ * If the semver string a is equal to b, return 0.
  *
  * @param {string} a
  * @param {string} b
@@ -55,6 +56,11 @@ const isPrerelease = (version) => {
  */
 // eslint-disable-next-line consistent-return
 const compareSemVer = (a, b) => {
+    // Special case for (x.x.x-x), present in a project
+    if (a.split('-')[0] === b.split('-')[0]) {
+        return 0;
+    }
+
     const pa = a.split('.');
     const pb = b.split('.');
     for (let i = 0; i < 3; i += 1) {
@@ -342,4 +348,5 @@ module.exports = {
     compareSemVer,
     validateChangelog,
     validateDate,
+    isPrerelease,
 };
