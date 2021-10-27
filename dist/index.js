@@ -9781,14 +9781,14 @@ const validateChangelog = (text) => {
         } else if (version) {
             const [, unreleased, versionValue, date] = line.match(reH2) || [];
 
-            if (!line.includes(' - ')) {
-                errors.push({
-                    message: 'Use a valid dash separation " - " between the version and date',
-                    lines: [lineNumber],
-                });
-            }
-
             if (!isUnreleased(unreleased, date)) {
+                if (!line.includes(' - ')) {
+                    errors.push({
+                        message: 'Use a valid dash separation " - " between the version and date',
+                        lines: [lineNumber],
+                    });
+                }
+
                 if (!date) {
                     errors.push({
                         message: 'A valid date is required for a version',
