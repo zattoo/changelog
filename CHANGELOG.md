@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 
 ## Unreleased
+
+### Fixed
 - [60](https://github.com/zattoo/changelog/issues/60) Supported validation of separator between version and date
 
 ## [1.7.0] - 11.06.2021
