@@ -25,11 +25,6 @@ describe('validateChangelog', () => {
         expect(() => validateChangelog('')).toThrow('No title is present');
     });
 
-    it('should throw error for wrong separator', async () => {
-        const wrongSeparator = await readFile('./src/__test__/changelogs/wrongSeparator.md', {encoding: 'utf-8'});
-        expect(() => validateChangelog(wrongSeparator)).toThrow('Use a valid dash separation " - " between the version and date');
-    });
-
     it('should throw error for more than one title', async () => {
         const multipleH1 = await readFile('./src/__test__/changelogs/twoTitles.md', {encoding: 'utf-8'});
         expect(() => validateChangelog(multipleH1)).toThrow('Only one title is allowed');
