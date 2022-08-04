@@ -10458,6 +10458,7 @@ const run = async () => {
             }
         }
     } catch (error) {
+        core.debug(error.stack);
         core.setFailed(error.message);
     }
 };
