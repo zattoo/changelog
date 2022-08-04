@@ -9653,7 +9653,7 @@ const changeTypes = [
  *
  * @see https://regex101.com/r/v5VmTx/2
  */
-const reH2 = /^##\s\[?(Unreleased)\]?|^##\s\[((?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-(?:(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?:[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)\] - (Unreleased|(?:\d\d?\d?\d?[-/.]\d\d?[-/.]\d\d?\d?\d))$/;
+const reH2 = /^##\s\[?(Unreleased)\]?|^##\s\[((?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-(?:(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?:[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)\]\s*\W\s*(Unreleased|(?:\d\d?\d?\d?[-/.]\d\d?[-/.]\d\d?\d?\d))$/;
 
 /**
  * Validates if the given text heading
@@ -9782,6 +9782,13 @@ const validateChangelog = (text) => {
             const [, unreleased, versionValue, date] = line.match(reH2) || [];
 
             if (!isUnreleased(unreleased, date)) {
+                if (!line.includes(' - ')) {
+                    errors.push({
+                        message: 'Use a valid dash separation " - " between the version and date',
+                        lines: [lineNumber],
+                    });
+                }
+
                 if (!date) {
                     errors.push({
                         message: 'A valid date is required for a version',
