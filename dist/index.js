@@ -9633,7 +9633,9 @@ module.exports = parse;
 /***/ }),
 
 /***/ 601:
-/***/ (function(module) {
+/***/ (function(module, __unusedexports, __webpack_require__) {
+
+const core = __webpack_require__(470);
 
 const changeTypes = [
     'Added',
@@ -9651,9 +9653,9 @@ const changeTypes = [
  * Capture Group 1: Version | Unreleased
  * Capture Group 2: Date | Unreleased
  *
- * @see https://regex101.com/r/v5VmTx/2
+ * @see https://regex101.com/r/ZQdEy6/1
  */
-const reH2 = /^##\s\[?(Unreleased)\]?|^##\s\[((?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-(?:(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?:[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)\]\s*\W\s*(Unreleased|(?:\d\d?\d?\d?[-/.]\d\d?[-/.]\d\d?\d?\d))$/;
+const reH2 = /^##\s\[?(Unreleased)\]?|^##\s\[((?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-(?:(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?:[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)\]\s*\W\s*(Unreleased|(?:\d\d?\d?\d?[-/.]\d\d?[-/.]\d\d?\d?\d))( \[YANKED\])?$/;
 
 /**
  * Validates if the given text heading
@@ -9978,6 +9980,13 @@ const validateChangelog = (text) => {
 
     // Return the last version
     const latestVersion = skeleton.versions[0];
+
+    /**
+     *  Debug using `ACTIONS_STEP_DEBUG` to true
+     *
+     * @see https://github.com/actions/toolkit/blob/HEAD/docs/action-debugging.md#step-debug-logs
+     */
+    core.debug(skeleton);
 
     return {
         isUnreleased: isUnreleased(latestVersion.unreleased, latestVersion.date),
@@ -10449,6 +10458,7 @@ const run = async () => {
             }
         }
     } catch (error) {
+        core.debug(error.stack);
         core.setFailed(error.message);
     }
 };
