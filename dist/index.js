@@ -9633,7 +9633,9 @@ module.exports = parse;
 /***/ }),
 
 /***/ 601:
-/***/ (function(module) {
+/***/ (function(module, __unusedexports, __webpack_require__) {
+
+const core = __webpack_require__(470);
 
 const changeTypes = [
     'Added',
@@ -9978,6 +9980,13 @@ const validateChangelog = (text) => {
 
     // Return the last version
     const latestVersion = skeleton.versions[0];
+
+    /**
+     *  Debug using `ACTIONS_STEP_DEBUG` to true
+     *
+     * @see https://github.com/actions/toolkit/blob/HEAD/docs/action-debugging.md#step-debug-logs
+     */
+    core.debug(skeleton);
 
     return {
         isUnreleased: isUnreleased(latestVersion.unreleased, latestVersion.date),

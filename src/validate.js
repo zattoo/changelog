@@ -1,3 +1,5 @@
+const core = require('@actions/core');
+
 const changeTypes = [
     'Added',
     'Changed',
@@ -341,6 +343,13 @@ const validateChangelog = (text) => {
 
     // Return the last version
     const latestVersion = skeleton.versions[0];
+
+    /**
+     *  Debug using `ACTIONS_STEP_DEBUG` to true
+     *
+     * @see https://github.com/actions/toolkit/blob/HEAD/docs/action-debugging.md#step-debug-logs
+     */
+    core.debug(skeleton);
 
     return {
         isUnreleased: isUnreleased(latestVersion.unreleased, latestVersion.date),
