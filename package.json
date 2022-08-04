@@ -1,6 +1,6 @@
 {
   "name": "changelog",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "description": "Detects changes and validates a given changelog",
   "main": "src/index.js",
   "scripts": {

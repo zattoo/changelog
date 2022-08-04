@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 
-## Unreleased
+## [1.8.0] - 04.08.2022
 
 ### Added
 - [65](https://github.com/zattoo/changelog/issues/65) Supported [Yanked](https://keepachangelog.com/en/1.0.0/#yanked) releases
