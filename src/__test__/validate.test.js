@@ -17,8 +17,8 @@ describe('validateChangelog', () => {
             isUnreleased, version, date,
         } = validateChangelog(changelogContent);
         expect(isUnreleased).toBe(false);
-        expect(version).toBe('1.0.0');
-        expect(date).toBe('29.06.2020');
+        expect(version).toBe('2.0.0');
+        expect(date).toBe('04.08.2022');
     });
 
     it('should throw error for not title present', () => {
