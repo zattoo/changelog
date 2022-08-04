@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 
 ## Unreleased
 
+### Added
+- [65](https://github.com/zattoo/changelog/issues/65) Supported [Yanked](https://keepachangelog.com/en/1.0.0/#yanked) releases
+
 ### Fixed
 - [60](https://github.com/zattoo/changelog/issues/60) Supported validation of separator between version and date
 
