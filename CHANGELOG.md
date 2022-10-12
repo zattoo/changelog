@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 
+## Unreleased
+
+### Infrastructure
+- Update actions/checkout to v3
+
 ## [1.8.0] - 04.08.2022
 
 ### Added
