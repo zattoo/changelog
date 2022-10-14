@@ -31,6 +31,7 @@ const reH2 = /^##\s\[?(Unreleased)\]?|^##\s\[((?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?
 const checkHeadingSpaces = (text, level) => {
     const re = `^${'#'.repeat(level)}\\s([^\\s].*)$`;
     const regex = new RegExp(re, 'g');
+
     return regex.test(text);
 };
 
@@ -43,6 +44,7 @@ const checkHeadingSpaces = (text, level) => {
 const isPrerelease = (version) => {
     const lowerCasedVersion = version.toLowerCase();
     const preReleases = ['alpha', 'rc', 'beta', 'dev'];
+
     return preReleases.some((name) => lowerCasedVersion.includes(name));
 };
 
@@ -65,13 +67,26 @@ const compareSemVer = (a, b) => {
 
     const pa = a.split('.');
     const pb = b.split('.');
+
     for (let i = 0; i < 3; i += 1) {
         const na = Number(pa[i]);
         const nb = Number(pb[i]);
-        if (na > nb) return 1;
-        if (nb > na) return -1;
-        if (!isNaN(na) && isNaN(nb)) return 1;
-        if (isNaN(na) && !isNaN(nb)) return -1;
+
+        if (na > nb) {
+            return 1;
+        }
+
+        if (nb > na) {
+            return -1;
+        }
+
+        if (!isNaN(na) && isNaN(nb)) {
+            return 1;
+        }
+
+        if (isNaN(na) && !isNaN(nb)) {
+            return -1;
+        }
     }
 };
 
@@ -219,6 +234,7 @@ const validateChangelog = (text) => {
                 if (!skeleton.versionsContent[lastVersion]) {
                     skeleton.versionsContent[lastVersion] = [];
                 }
+
                 skeleton.versionsContent[lastVersion].push({
                     value: typeValue,
                     lineNumber,
@@ -249,6 +265,7 @@ const validateChangelog = (text) => {
             if (!skeleton.versionText[lastVersion]) {
                 skeleton.versionText[lastVersion] = [];
             }
+
             skeleton.versionText[lastVersion].push({
                 lineNumber,
                 value: line,
@@ -280,6 +297,7 @@ const validateChangelog = (text) => {
 
     // Check if unreleased version is the first heading if present
     const unreleasedIndex = skeleton.versions.findIndex((version) => version.value.toLowerCase().includes('unreleased'));
+
     if (unreleasedIndex > 0) {
         errors.push({
             message: 'Unreleased version must be the fist version heading',
@@ -290,6 +308,7 @@ const validateChangelog = (text) => {
     // Check repeated versions
     const repeatedCounts = skeleton.versions.reduce((acc, version) => {
         acc[version.value] = ++acc[version.value] || 0;
+
         return acc;
     }, {});
 
@@ -319,6 +338,7 @@ const validateChangelog = (text) => {
     // Check duplicated headings for version
     Object.entries(skeleton.versionsContent).forEach(([version, headings]) => {
         const unrepeatedHeadings = new Set(headings.map((heading) => heading.value));
+
         if (unrepeatedHeadings.size !== headings.length) {
             errors.push({
                 message: `Version "${version}" can't have repeated headings`,
@@ -330,8 +350,10 @@ const validateChangelog = (text) => {
     // Combine and throw errors
     if (errors.length) {
         const errorLog = [];
+
         errors.forEach((error) => {
             errorLog.push(`\n${error.message}`);
+
             if (error.lines) {
                 error.lines.forEach((line, i) => {
                     errorLog.push((`${i === error.lines.length - 1 ? ' └─ ' : ' ├─ '}Line: ${line}, ${lines[line - 1]}`));

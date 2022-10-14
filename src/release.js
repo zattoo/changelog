@@ -38,12 +38,14 @@ const validateRelease = async (changelog) => {
     }
 
     const {version: packageVersion} = JSON.parse(await readFile(`${folder}package.json`, {encoding: 'utf-8'}));
+
     if (packageVersion !== version) {
         throw new Error(`The package version "${packageVersion}" does not match the newest version "${version}" of changelog: ${changelog}`);
     }
 
     if (await exists(`${folder}package-lock.json`)) {
         const {version: packageLockVersion} = JSON.parse(await readFile(`${folder}package-lock.json`, {encoding: 'utf-8'}));
+
         if (packageLockVersion !== version) {
             throw new Error(`The package-lock version "${packageVersion}" does not match the newest version "${version}" of changelog: ${changelog}`);
         }
@@ -53,6 +55,7 @@ const validateRelease = async (changelog) => {
     // and version has the same major version as previous.
     const text = skeleton.versionText[version].map((v) => v.value).join();
     const previousVersion = skeleton.versions[1];
+
     if (
         text.includes('breaking change')
             && (previousVersion.value.split('.')[0] === version.split('.')[0])

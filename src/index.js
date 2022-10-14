@@ -59,6 +59,7 @@ const run = async () => {
         // Limits modified files to the ones in the project folder of the release
         if (isReleaseBranch && project) {
             const isInAppFolder = wcmatch([`projects/${project}/**`, `packages/${project}/**`]);
+
             modifiedFiles = modifiedFiles.filter((file) => isInAppFolder(file));
         }
 
@@ -81,6 +82,7 @@ const run = async () => {
             }
 
             const changelogContent = await readFile(`${folder}CHANGELOG.md`, {encoding: 'utf-8'});
+
             validateChangelog(changelogContent);
         }));
 

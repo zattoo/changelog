@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "lint": "eslint .",
-    "package": "ncc build src/index.js -o dist",
+    "package": "NODE_OPTIONS=--openssl-legacy-provider ncc build src/index.js -o dist",
     "test": "npm run lint && jest"
   },
   "repository": {
@@ -27,17 +27,17 @@
   },
   "homepage": "https://github.com/zattoo/changelog#readme",
   "dependencies": {
-    "@actions/core": "1.2.6",
-    "@actions/github": "4.0.0",
-    "glob": "7.1.6",
-    "wildcard-match": "5.1.0"
+    "@actions/core": "1.10.0",
+    "@actions/github": "5.1.1",
+    "glob": "8.0.3",
+    "wildcard-match": "5.1.2"
   },
   "devDependencies": {
-    "@zattoo/eslint-config": "11.0.4",
+    "@zattoo/eslint-config": "14.0.0",
     "@zeit/ncc": "0.22.3",
-    "eslint": "7.14.0",
-    "eslint-config-airbnb-base": "14.2.0",
-    "eslint-plugin-import": "2.22.0",
-    "jest": "26.6.3"
+    "eslint": "8.25.0",
+    "eslint-config-airbnb-base": "15.0.0",
+    "eslint-plugin-import": "2.26.0",
+    "jest": "29.2.0"
   }
 }
