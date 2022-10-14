@@ -16,7 +16,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 - eslint-config-airbnb-base `14.2.0` -> `15.0.0`
 - jest `26.6.3` -> `29.2.0`
 
-
 ## [1.8.0] - 04.08.2022
 
 ### Added
