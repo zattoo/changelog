@@ -1,4 +1,3 @@
-/* eslint-disable no-empty */
 const fs = require('fs');
 const util = require('util');
 
