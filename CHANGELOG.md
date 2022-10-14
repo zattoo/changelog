@@ -7,6 +7,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 
 ### Infrastructure
 - Update actions/checkout to v3
+- @actions/core `1.2.6` -> `1.10.6`
+- @actions/github `4.0.0` -> `5.1.1`
+- glob `7.1.6` -> `8.0.3`
+- wildcard-match `5.1.0` -> `5.1.2`
+- @zattoo/eslint-config `11.0.4` -> `14.0.0`
+- eslint `7.14.0` -> `8.25.0`
+- eslint-config-airbnb-base `14.2.0` -> `15.0.0`
+- jest `26.6.3` -> `29.2.0`
+
 
 ## [1.8.0] - 04.08.2022
 
