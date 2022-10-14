@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "lint": "eslint .",
-    "package": "ncc build src/index.js -o dist",
+    "package": "NODE_OPTIONS=--openssl-legacy-provider ncc build src/index.js -o dist",
     "test": "npm run lint && jest"
   },
   "repository": {
