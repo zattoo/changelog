@@ -8577,7 +8577,7 @@ const getModifiedFiles = async ({
     owner,
     pullNumber,
 }) => {
-    const files = await octokit.pulls.listFiles({
+    const files = await octokit.rest.pulls.listFiles({
         owner,
         repo,
         pull_number: pullNumber,
@@ -8601,7 +8601,7 @@ const getFileContent = async ({
     ref,
 }) => {
     try {
-        const content = await octokit.repos.getContent({
+        const content = await octokit.rest.repos.getContent({
             owner,
             repo,
             path,
