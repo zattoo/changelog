@@ -78,6 +78,7 @@ const getFileContent = async ({
          * should not stop execution
          */
         console.log(error.message);
+
         return null;
     }
 };

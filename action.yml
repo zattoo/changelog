@@ -18,7 +18,7 @@ inputs:
     required: false
     default: '-changelog'
 runs:
-  using: 'node12'
+  using: 'node18'
   main: 'dist/index.js'
 branding:
   icon: file-text
