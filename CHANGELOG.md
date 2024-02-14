@@ -5,6 +5,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 
 ## Unreleased
 
+### Infrastructure
 - Upgraded from node `16` to `20`
 
 ## [1.9.0] - 17.04.2022
