@@ -7,7 +7,7 @@ const {
     compareSemVer,
     validateChangelog,
     validateDate,
-} = require('../validate');
+} = require('../validate.js');
 
 describe('validateChangelog', () => {
     it('should be a valid changelog', async () => {
