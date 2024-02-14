@@ -1,7 +1,7 @@
-const fs = require('fs');
+const {readFile} = require('node:fs/promises');
+const fs = require('node:fs');
 const util = require('util');
 
-const readFile = util.promisify(fs.readFile);
 const exists = util.promisify(fs.exists);
 
 const {validateChangelog} = require('./validate.js');
