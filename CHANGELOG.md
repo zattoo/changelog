@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 
 ### Infrastructure
 - Upgraded from node `16` to `20`
+- Replace `@zeit/ncc` with `@vercel/ncc`
 
 ## [1.9.0] - 17.04.2022
 
