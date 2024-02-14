@@ -109,17 +109,24 @@ const validateDate = (date) => {
     return false;
 };
 
+/**
+ *
+ * @param {string} unreleased
+ * @param {string} date
+ */
 const isUnreleased = (unreleased, date) => Boolean(unreleased) || date === 'Unreleased';
 
+/** @param {string} text */
 const getTitle = (text) => text.match(/^#[ ]{1,}(.+)$/) || [];
+/** @param {string} text */
 const isVersion = (text) => text.match(/^##[ ]{1,}.+/);
+/** @param {string} text */
 const isType = (text) => text.match(/^###[ ]{1,}.+/);
 
 /**
  * Check all errors present in the given changelog
  *
  * @param {string} text
- * @returns {object}
  */
 const validateChangelog = (text) => {
     const errors = [];
@@ -349,6 +356,7 @@ const validateChangelog = (text) => {
 
     // Combine and throw errors
     if (errors.length) {
+        /** @type {string[]} */
         const errorLog = [];
 
         errors.forEach((error) => {
@@ -371,7 +379,7 @@ const validateChangelog = (text) => {
      *
      * @see https://github.com/actions/toolkit/blob/HEAD/docs/action-debugging.md#step-debug-logs
      */
-    core.debug(skeleton);
+    core.debug(JSON.stringify(skeleton));
 
     return {
         isUnreleased: isUnreleased(latestVersion.unreleased, latestVersion.date),

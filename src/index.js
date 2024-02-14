@@ -1,9 +1,6 @@
-const fs = require('fs');
+const {readFile} = require('node:fs/promises');
 const core = require('@actions/core');
-const util = require('util');
 const wcmatch = require('wildcard-match');
-
-const readFile = util.promisify(fs.readFile);
 
 const {
     context,

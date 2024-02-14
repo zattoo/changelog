@@ -1,13 +1,9 @@
-const util = require('util');
-const glob = require('glob');
-
-const globPromise = util.promisify(glob);
+const glob = require('fast-glob');
 
 /**
  * List all folders specified in sources
  *
  * @param {string} [sources]
- * @returns {Promise<string[]>}
  */
 const getFolders = async (sources) => {
     /** Use root directory if sources is not defined */
@@ -15,11 +11,12 @@ const getFolders = async (sources) => {
         return [''];
     }
 
+    /** @type {string[]} */
     const folders = [];
 
     await Promise.all(sources.split(/, */g).map(async (source) => {
-        if (glob.hasMagic(source)) {
-            folders.push(...await globPromise(source.endsWith('/') ? source : `${source}/`));
+        if (glob.isDynamicPattern(source)) {
+            folders.push(...await glob(source.endsWith('/') ? source : `${source}/`));
         } else {
             folders.push(source);
         }
@@ -32,7 +29,6 @@ const getFolders = async (sources) => {
  * Returns the modified files in the PR
  *
  * @param {PullRequest} param
- * @returns {Promise<string[]>}
  */
 const getModifiedFiles = async ({
     octokit,
@@ -54,7 +50,6 @@ const getModifiedFiles = async ({
  * Returns the content of a file
  *
  * @param {PullRequest} param
- * @returns {Promise<string>}
  */
 const getFileContent = async ({
     octokit,
@@ -77,7 +72,7 @@ const getFileContent = async ({
          * Cases where file does not exists
          * should not stop execution
          */
-        console.log(error.message);
+        console.log(error instanceof Error ? error.message : 'Unknown error');
 
         return null;
     }

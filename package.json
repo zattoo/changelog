@@ -4,7 +4,7 @@
   "description": "Detects changes and validates a given changelog",
   "main": "src/index.js",
   "scripts": {
-    "lint": "eslint .",
+    "lint": "eslint . && tsc",
     "package": "ncc build src/index.js -o dist",
     "test": "npm run lint && jest"
   },
@@ -29,7 +29,7 @@
   "dependencies": {
     "@actions/core": "1.10.1",
     "@actions/github": "6.0.0",
-    "glob": "10.3.10",
+    "fast-glob": "3.3.2",
     "wildcard-match": "5.1.2"
   },
   "devDependencies": {
