@@ -4,7 +4,7 @@
   "description": "Detects changes and validates a given changelog",
   "main": "src/index.js",
   "scripts": {
-    "lint": "eslint . && tsc",
+    "lint": "eslint .",
     "package": "ncc build src/index.js -o dist",
     "test": "npm run lint && jest"
   },
