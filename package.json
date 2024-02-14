@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "lint": "eslint .",
-    "package": "NODE_OPTIONS=--openssl-legacy-provider ncc build src/index.js -o dist",
+    "package": "ncc build src/index.js -o dist",
     "test": "npm run lint && jest"
   },
   "repository": {
@@ -33,8 +33,8 @@
     "wildcard-match": "5.1.2"
   },
   "devDependencies": {
+    "@vercel/ncc": "0.38.1",
     "@zattoo/eslint-config": "15.2.0",
-    "@zeit/ncc": "0.22.3",
     "eslint": "8.56.0",
     "eslint-config-airbnb-base": "15.0.0",
     "eslint-plugin-import": "2.29.1",
