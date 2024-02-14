@@ -76,7 +76,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Changelog Validate
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: zattoo/changelog@v1
         with:
           token: ${{github.token}}

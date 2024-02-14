@@ -4,8 +4,8 @@ const util = require('util');
 const readFile = util.promisify(fs.readFile);
 const exists = util.promisify(fs.exists);
 
-const {validateChangelog} = require('./validate');
-const {getFileContent} = require('./files');
+const {validateChangelog} = require('./validate.js');
+const {getFileContent} = require('./files.js');
 
 /**
  * Given the path of a changelog it will

@@ -13,12 +13,12 @@ const {
 const {
     compareChangelog,
     validateRelease,
-} = require('./release');
-const {validateChangelog} = require('./validate');
+} = require('./release.js');
+const {validateChangelog} = require('./validate.js');
 const {
     getFolders,
     getModifiedFiles,
-} = require('./files');
+} = require('./files.js');
 
 const run = async () => {
     const token = core.getInput('token', {required: true});
