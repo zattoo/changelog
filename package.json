@@ -33,7 +33,7 @@
     "wildcard-match": "5.1.4"
   },
   "devDependencies": {
-    "@vercel/ncc": "0.38.1",
+    "@vercel/ncc": "0.45.0",
     "@zattoo/eslint-config": "15.2.0",
     "eslint": "8.56.0",
     "eslint-config-airbnb-base": "15.0.0",
