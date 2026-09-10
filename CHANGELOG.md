@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 
-## Unreleased
+## [3.0.0] - 10.09.2026
 
 ### Infrastructure
 - `action.yml`: `using: node20` → `node24`
