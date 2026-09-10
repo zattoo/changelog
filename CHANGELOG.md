@@ -3,6 +3,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 
+## Unreleased
+
+### Infrastructure
+- `action.yml`: `using: node20` → `node24`
+- `.nvmrc`: `v20.1.0` → `v24`
+- `actions/checkout@v4` → `@v7`
+- Rebuilt `dist/index.js` with the updated ncc
+- Updated some other dependencies
+
 ## [2.0.0] - 14.02.2024
 
 ### Infrastructure
